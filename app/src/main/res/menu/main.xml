@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:AMPT="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" >
+    <item android:id="@+id/menu_refresh"
+        android:title="@string/action_settings"
+        android:checkable="false"
+        android:orderInCategory="1"
+        AMPT:showAsAction="ifRoom"/>
+    <item android:id="@+id/menu_scan"
+        android:title="@string/menu_scan"
+        android:orderInCategory="100"
+        AMPT:showAsAction="ifRoom|withText"/>
+    <item android:id="@+id/menu_stop"
+        android:title="@string/menu_stop"
+        android:orderInCategory="101"
+        AMPT:showAsAction="ifRoom|withText"/>
+</menu>
