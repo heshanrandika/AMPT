@@ -43,7 +43,7 @@ public class SplashScreen extends Activity {
 
                     // Run next activity
                     Intent intent = new Intent();
-                    intent.setClass(sPlashScreen, MainActivity.class);
+                    intent.setClass(sPlashScreen, LoginActivity.class);
                     startActivity(intent);
                     on = false;
                 }
