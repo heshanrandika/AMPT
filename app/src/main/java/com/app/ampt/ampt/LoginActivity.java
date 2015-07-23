@@ -1,11 +1,15 @@
 package com.app.ampt.ampt;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
+import com.app.ampt.ampt.activities.SignInActivity;
+import com.app.ampt.ampt.activities.SignUpActivity;
 import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.DialogError;
 import com.facebook.android.Facebook;
@@ -23,6 +27,7 @@ public class LoginActivity extends Activity {
     private AsyncFacebookRunner mAsyncRunner;
     String FILENAME = "AndroidSSO_data";
     private SharedPreferences mPrefs;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,14 +37,31 @@ public class LoginActivity extends Activity {
         facebook = new Facebook(APP_ID);
         mAsyncRunner = new AsyncFacebookRunner(facebook);
 
-        Button facebookLogin= (Button) findViewById(R.id.loginWithfacebookButton);
+        Button facebookLogin = (Button) findViewById(R.id.loginWithfacebookButton);
         facebookLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 loginToFacebook();
             }
         });
-    }
+
+
+        TextView signIn= (TextView) findViewById(R.id.textViewSignIn);
+        signIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LoginActivity.this, SignInActivity.class));
+            }
+        });
+
+        Button signUp = (Button) findViewById(R.id.signupButton);
+        signUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
+            }
+        });
+}
 
     public void loginToFacebook() {
         mPrefs = getPreferences(MODE_PRIVATE);
@@ -56,7 +78,7 @@ public class LoginActivity extends Activity {
 
         if (!facebook.isSessionValid()) {
             facebook.authorize(this,
-                    new String[] { "email", "publish_stream" },
+                    new String[]{"email", "publish_stream"},
                     new Facebook.DialogListener() {
 
                         @Override

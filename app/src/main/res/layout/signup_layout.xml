@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:id="@+id/imageViewProfilePic"
+        android:src="@drawable/profile_image"
+        android:layout_gravity="center_horizontal"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="24dp" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/imageViewProfilePic"
+        android:layout_alignParentBottom="true">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:hint="Name"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:ems="10"
+            android:id="@+id/signupActivity_name"
+            android:layout_gravity="center_horizontal" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:hint="Last Name"
+            android:layout_marginTop="10dp"
+            android:ems="10"
+            android:gravity="center"
+            android:id="@+id/signupActivity_lastname"
+            android:layout_gravity="center_horizontal" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
+            android:ems="10"
+            android:layout_marginTop="10dp"
+            android:hint="Email"
+            android:gravity="center"
+            android:id="@+id/signupActivity_email"
+            android:layout_gravity="center_horizontal" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:hint="Password"
+            android:layout_marginTop="10dp"
+            android:ems="10"
+            android:gravity="center"
+            android:id="@+id/signupActivity_password"
+            android:layout_gravity="center_horizontal" />
+
+        <Button
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:text="Create"
+            android:layout_marginTop="15dp"
+            android:id="@+id/signupActivity_create"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
+</RelativeLayout>

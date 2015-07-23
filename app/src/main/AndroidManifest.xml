@@ -28,6 +28,9 @@
             </intent-filter>
         </activity>
         <activity android:name="com.app.ampt.ampt.LoginActivity"/>
+        <activity android:name="com.app.ampt.ampt.activities.SignUpActivity"/>
+        <activity android:name="com.app.ampt.ampt.activities.SignInActivity"/>
+
     </application>
 
 </manifest>
