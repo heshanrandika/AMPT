@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ampt-android.iml" filepath="$PROJECT_DIR$/ampt-android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AMPT.iml" filepath="$PROJECT_DIR$/AMPT.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
