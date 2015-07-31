@@ -1,4 +1,4 @@
-package com.app.ampt.ampt.bean;
+package com.ampt.bluetooth.bean;
 
 /**
  * Created by malith on 7/23/15.
@@ -9,23 +9,23 @@ public class User {
     private String lastName;
     private String email;
     private String password;
-    private String imagePath;
+    private long imageId;
 
-    public User(int id, String name, String lastName, String email, String password, String imagePath) {
+    public User(int id, String name, String lastName, String email, String password, long imageId) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.imagePath= imagePath;
+        this.imageId= imageId;
     }
 
-    public User(String name, String lastName, String email, String password, String imagePath) {
+    public User(String name, String lastName, String email, String password, long imageId) {
         this.name = name;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.imagePath=imagePath;
+        this.imageId=imageId;
     }
 
     public int getId() {
@@ -68,11 +68,11 @@ public class User {
         this.password = password;
     }
 
-    public String getImagePath() {
-        return imagePath;
+    public long getImageId() {
+        return imageId;
     }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
+    public void setImageId(long imageId) {
+        this.imageId = imageId;
     }
 }

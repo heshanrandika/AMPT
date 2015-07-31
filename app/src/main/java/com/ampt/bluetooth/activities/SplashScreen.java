@@ -1,9 +1,11 @@
-package com.app.ampt.ampt;
+package com.ampt.bluetooth.activities;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MotionEvent;
+
+import com.ampt.bluetooth.R;
 
 /**
  * Created by Heshanr on 4/12/2015.
@@ -34,7 +36,7 @@ public class SplashScreen extends Activity {
                     try {
                         synchronized (this) {
                             // Wait given period of time or exit on touch
-                            wait(5000);
+                            wait(2000);
                         }
                     } catch (InterruptedException ex) {
                     }

@@ -1,4 +1,4 @@
-package com.ampt.bluetooth;
+package com.ampt.bluetooth.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,6 +10,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.ampt.bluetooth.R;
 import com.ampt.bluetooth.database.helper.DatabaseHelper;
 import com.ampt.bluetooth.database.model.ActivityData;
 

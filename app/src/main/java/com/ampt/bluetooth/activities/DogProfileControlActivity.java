@@ -1,4 +1,4 @@
-package com.ampt.bluetooth;
+package com.ampt.bluetooth.activities;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -21,9 +21,14 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.ampt.bluetooth.AddOrEditDogProfile;
+import com.ampt.bluetooth.R;
+import com.ampt.bluetooth.SampleGattAttributes;
+import com.ampt.bluetooth.chartView;
 import com.ampt.bluetooth.database.helper.DatabaseHelper;
 import com.ampt.bluetooth.database.model.ActivityData;
 import com.ampt.bluetooth.database.model.DogsData;
+import com.ampt.bluetooth.singleChartView;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;

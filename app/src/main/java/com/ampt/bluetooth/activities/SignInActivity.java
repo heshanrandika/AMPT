@@ -1,15 +1,17 @@
-package com.app.ampt.ampt.activities;
+package com.ampt.bluetooth.activities;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.app.ampt.ampt.R;
-import com.app.ampt.ampt.bean.User;
-import com.app.ampt.ampt.db.DBHelper;
+
+import com.ampt.bluetooth.R;
+import com.ampt.bluetooth.bean.User;
+import com.ampt.bluetooth.database.helper.DatabaseHelper;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,7 +33,10 @@ public class SignInActivity extends Activity {
         pattern = Pattern.compile(EMAIL_PATTERN);
 
         final EditText eemail = (EditText) findViewById(R.id.signInActivity_email);
+        eemail.setText("m@g.com");
+
         final EditText epassword = (EditText) findViewById(R.id.signInActivity_password);
+        epassword.setText("asd");
         Button signin = (Button) findViewById(R.id.signInActivity_signin_Button);
 
         signin.setOnClickListener(new View.OnClickListener() {
@@ -55,12 +60,13 @@ public class SignInActivity extends Activity {
                     Toast.makeText(SignInActivity.this, "Password can't be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                DBHelper dbh = new DBHelper(SignInActivity.this);
+                DatabaseHelper dbh = new DatabaseHelper(SignInActivity.this);
                 User usr = dbh.getUser(email);
                 if (null != usr) {
                     if (usr.getEmail().equals(email) && password.equals(usr.getPassword())) {
                         Toast.makeText(SignInActivity.this, "SignIn Success", Toast.LENGTH_SHORT).show();
-
+                        finish();
+                        startActivity(new Intent(SignInActivity.this, TabbedMainActivity.class));
                     } else {
                         Toast.makeText(SignInActivity.this, "Email or Password is wrong", Toast.LENGTH_SHORT).show();
                     }
@@ -69,4 +75,5 @@ public class SignInActivity extends Activity {
             }
         });
     }
+
 }

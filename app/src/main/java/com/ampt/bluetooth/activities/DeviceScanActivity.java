@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ampt.bluetooth;
+package com.ampt.bluetooth.activities;
 
 import android.app.Activity;
 import android.app.ListActivity;
@@ -36,6 +36,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ampt.bluetooth.AddOrEditDogProfile;
+import com.ampt.bluetooth.R;
 import com.ampt.bluetooth.database.helper.DatabaseHelper;
 
 import java.util.ArrayList;

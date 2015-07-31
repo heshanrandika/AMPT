@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.ampt.bluetooth.bean.User;
 import com.ampt.bluetooth.database.model.ActivityData;
 import com.ampt.bluetooth.database.model.DogsData;
 
@@ -31,6 +32,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Table Names
     private static final String TABLE_ACTIVITY_DATA = "activity_data";
     private static final String TABLE_DOGS_DATA = "dogs_data";
+    private static final String TABLE_USERS = "users";
+    private static final String TABLE_IMAGES = "images";
 
     // Common column names
     private static final String KEY_ID = "id";
@@ -46,7 +49,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_GOAL = "goal";
 
 
-
     // TABLE_ACTIVITY_DATA  - column names
     private static final String KEY_DOG_ID = "dog_id";
     private static final String KEY_PLAY = "play";
@@ -54,13 +56,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_SWIMMING = "swimming";
     private static final String KEY_SLEEP = "sleep";
 
+    //TABLE_USERS
+    private static final String KEY_LAST_NAME = "lastname";
+    private static final String KEY_EMAIL = "email";
+    private static final String KEY_PASSWORD = "password";
+    private static final String KEY_IMAGEID = "imageid";
 
+    //TABLE IMAGES
+    private static final String KEY_IMAGE_DATA = "imageData";
 
-    // Table Create Statements
+    private static String CREATE_USERS_TABLE = "CREATE TABLE "
+            + TABLE_USERS + "("
+            + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + KEY_NAME + " TEXT NOT NULL,"
+            + KEY_LAST_NAME + " TEXT NOT NULL,"
+            + KEY_EMAIL + " TEXT NOT NULL,"
+            + KEY_PASSWORD + " TEXT NOT NULL,"
+            + KEY_IMAGEID + " TEXT"
+            + ")";
+
+    private static String CREATE_IMAGE_DATA_TABLE = "CREATE TABLE "
+            + TABLE_IMAGES + "("
+            + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + KEY_IMAGE_DATA + " BLOB NOT NULL"
+            + ")";
+
     // TABLE_DOGS_DATA create statement
     private static final String CREATE_TABLE_DOGS_DATA = "CREATE TABLE "
             + TABLE_DOGS_DATA + "("
-            + KEY_ID + " INTEGER PRIMARY KEY,"
+            + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + KEY_NAME + " TEXT,"
             + KEY_GOAL + " TEXT,"
             + KEY_AGE + " INTEGER,"
@@ -74,7 +98,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // TABLE_ACTIVITY_DATA create statement
     private static final String CREATE_TABLE_ACTIVITY_DATA = "CREATE TABLE "
             + TABLE_ACTIVITY_DATA + "("
-            + KEY_ID + " INTEGER PRIMARY KEY,"
+            + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + KEY_DOG_ID + " INTEGER,"
             + KEY_PLAY + " INTEGER,"
             + KEY_WALK + " INTEGER,"
@@ -93,7 +117,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // creating required tables
         db.execSQL(CREATE_TABLE_DOGS_DATA);
         db.execSQL(CREATE_TABLE_ACTIVITY_DATA);
-
+        db.execSQL(CREATE_USERS_TABLE);
+        db.execSQL(CREATE_IMAGE_DATA_TABLE);
     }
 
     @Override
@@ -101,12 +126,74 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // on upgrade drop older tables
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIVITY_DATA);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_DOGS_DATA);
-
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_IMAGES);
         // create new tables
         onCreate(db);
     }
 
     // ------------------------ "todos" table methods ----------------//
+
+
+    // Adding new user
+    public long addUser(User user) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, user.getName());
+        values.put(KEY_LAST_NAME, user.getLastName());
+        values.put(KEY_EMAIL, user.getEmail());
+        values.put(KEY_PASSWORD, user.getPassword());
+        values.put(KEY_IMAGEID, user.getImageId());
+
+
+        // Inserting Row
+        long id = db.insert(TABLE_USERS, null, values);
+
+        db.close(); // Closing database connection
+        return id;
+    }
+
+    public User getUser(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        User user = null;
+        Cursor cursor = db.query(TABLE_USERS, new String[]{KEY_ID, KEY_NAME, KEY_LAST_NAME, KEY_EMAIL, KEY_PASSWORD, KEY_IMAGEID}, KEY_EMAIL + "=?", new String[]{String.valueOf(email)}, null, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+
+            user = new User(Integer.parseInt(cursor.getString(0)),
+                    cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4), cursor.getLong(5));
+        }
+        db.close();
+        return user;
+    }
+
+    //save image
+    public long saveImage(byte[] image){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_IMAGE_DATA,image);
+
+
+        // Inserting Row
+        long id = db.insert(TABLE_IMAGES, null, values);
+
+        db.close(); // Closing database connection
+        return id;
+    }
+
+    public byte[] getImage(long user_id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        byte[] image = null;
+        Cursor cursor = db.query(TABLE_IMAGES, new String[]{ KEY_IMAGE_DATA}, KEY_ID + "=?", new String[]{String.valueOf(user_id)}, null, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+
+            image = cursor.getBlob(0);
+        }
+        db.close();
+        return image;
+    }
+
 
     /**
      * Creating a dog profile
@@ -143,7 +230,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         Cursor c = db.rawQuery(selectQuery, null);
 
-        if (c != null &&  c.moveToFirst()){
+        if (c != null && c.moveToFirst()) {
 
             DogsData dogProfile = new DogsData();
             dogProfile.setId(c.getInt(c.getColumnIndex(KEY_ID)));
@@ -158,7 +245,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             db.close();
             return dogProfile;
-        }else{
+        } else {
             db.close();
             return null;
         }
@@ -170,14 +257,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public DogsData getDogBasic(long dog_id) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String selectQuery = "SELECT  "+KEY_NAME+","+KEY_AGE+","+KEY_GOAL+","+KEY_ID+" FROM " + TABLE_DOGS_DATA + " WHERE "
+        String selectQuery = "SELECT  " + KEY_NAME + "," + KEY_AGE + "," + KEY_GOAL + "," + KEY_ID + " FROM " + TABLE_DOGS_DATA + " WHERE "
                 + KEY_ID + " = " + dog_id;
 
         Log.e(LOG, selectQuery);
 
         Cursor c = db.rawQuery(selectQuery, null);
 
-        if (c != null &&  c.moveToFirst()){
+        if (c != null && c.moveToFirst()) {
 
             DogsData dogProfile = new DogsData();
             dogProfile.setId(c.getInt(c.getColumnIndex(KEY_ID)));
@@ -187,7 +274,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             db.close();
             return dogProfile;
-        }else{
+        } else {
             db.close();
             return null;
         }
@@ -200,13 +287,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         String selectQuery = "SELECT  * FROM " + TABLE_DOGS_DATA + " WHERE "
-                + KEY_DEVICE_ADDRESS + " = " + "\""+deviceAddress+"\"";
+                + KEY_DEVICE_ADDRESS + " = " + "\"" + deviceAddress + "\"";
 
         Log.e(LOG, selectQuery);
         //Cursor c = db.query(TABLE_DOGS_DATA, null, KEY_DEVICE_ADDRESS + "=?",new String[] { deviceAddress }, null, null, null, null);
         Cursor c = db.rawQuery(selectQuery, null);
 
-        if (c != null && c.moveToFirst()){
+        if (c != null && c.moveToFirst()) {
             DogsData dogProfile = new DogsData();
             dogProfile.setId(c.getInt(c.getColumnIndex(KEY_ID)));
             dogProfile.setName((c.getString(c.getColumnIndex(KEY_NAME))));
@@ -221,17 +308,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
             return dogProfile;
 
-        }else {
+        } else {
             db.close();
             return null;
         }
 
 
-
     }
+
     /**
      * getting all DogProfile
-     * */
+     */
     public ArrayList<DogsData> getAllDogProfile() {
         ArrayList<DogsData> dogList = new ArrayList<DogsData>();
         String selectQuery = "SELECT  * FROM " + TABLE_DOGS_DATA;
@@ -242,7 +329,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor c = db.rawQuery(selectQuery, null);
 
         // looping through all rows and adding to list
-        if (c != null &&  c.moveToFirst()) {
+        if (c != null && c.moveToFirst()) {
             do {
                 DogsData dogProfile = new DogsData();
                 dogProfile.setId(c.getInt(c.getColumnIndex(KEY_ID)));
@@ -264,10 +351,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * getting all DeviceAddress
-     * */
+     */
     public ArrayList<String> getAllDeviceAddress() {
         ArrayList<String> deviceAddressList = new ArrayList<String>();
-        String selectQuery = "SELECT  "+KEY_DEVICE_ADDRESS+" FROM " + TABLE_DOGS_DATA;
+        String selectQuery = "SELECT  " + KEY_DEVICE_ADDRESS + " FROM " + TABLE_DOGS_DATA;
 
         Log.e(LOG, selectQuery);
 
@@ -275,7 +362,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor c = db.rawQuery(selectQuery, null);
 
         // looping through all rows and adding to list
-        if (c != null &&  c.moveToFirst()) {
+        if (c != null && c.moveToFirst()) {
             do {
                 deviceAddressList.add((c.getString(c.getColumnIndex(KEY_DEVICE_ADDRESS))));
             } while (c.moveToNext());
@@ -313,7 +400,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_CREATED_AT, getDateTime());
 
 
-        int updated = db.update(TABLE_DOGS_DATA, values, KEY_ID + " = ?",new String[] { String.valueOf(data.getId()) });
+        int updated = db.update(TABLE_DOGS_DATA, values, KEY_ID + " = ?", new String[]{String.valueOf(data.getId())});
         db.close();
         return updated;
     }
@@ -323,10 +410,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void deleteDogProfile(long dog_id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_DOGS_DATA, KEY_ID + " = ?", new String[] { String.valueOf(dog_id) });
+        db.delete(TABLE_DOGS_DATA, KEY_ID + " = ?", new String[]{String.valueOf(dog_id)});
     }
-
-
 
 
     // ------------------------ "DogActivity" table methods ----------------//
@@ -353,7 +438,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * getting all ActivityDog
-     * */
+     */
     public ArrayList<ActivityData> getAllActivityDog(long dog_id) {
         ArrayList<ActivityData> activities = new ArrayList<ActivityData>();
         String selectQuery = "SELECT  * FROM " + TABLE_ACTIVITY_DATA + " WHERE " + KEY_DOG_ID + " = " + dog_id;
@@ -387,10 +472,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * getting all ActivityDog
-     * */
-    public ArrayList<ActivityData> getAllActivityDogDateRange(long dog_id,int dateBack) {
+     */
+    public ArrayList<ActivityData> getAllActivityDogDateRange(long dog_id, int dateBack) {
         ArrayList<ActivityData> activities = new ArrayList<ActivityData>();
-        String selectQuery = "SELECT  * FROM " + TABLE_ACTIVITY_DATA + " WHERE " + KEY_DOG_ID + " = " + dog_id + " AND "+ KEY_CREATED_AT +" > DATE('NOW','-"+dateBack+" DAYS')";
+        String selectQuery = "SELECT  * FROM " + TABLE_ACTIVITY_DATA + " WHERE " + KEY_DOG_ID + " = " + dog_id + " AND " + KEY_CREATED_AT + " > DATE('NOW','-" + dateBack + " DAYS')";
 
         Log.e(LOG, selectQuery);
 
@@ -421,11 +506,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * getting all Activity
-     * */
+     */
 
     public ArrayList<ActivityData> getAllActivityDateRange(int dateBack) {
         ArrayList<ActivityData> activities = new ArrayList<ActivityData>();
-        String selectQuery = "SELECT  * FROM " + TABLE_ACTIVITY_DATA + " WHERE "+ KEY_CREATED_AT +" > DATE('NOW','-"+dateBack+" DAYS')";
+        String selectQuery = "SELECT  * FROM " + TABLE_ACTIVITY_DATA + " WHERE " + KEY_CREATED_AT + " > DATE('NOW','-" + dateBack + " DAYS')";
 
         Log.e(LOG, selectQuery);
 
@@ -452,12 +537,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return activities;
     }
+
     /**
      * Deleting a Activity
      */
     public void deleteActivity(long activity_id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_ACTIVITY_DATA, KEY_ID + " = ?",new String[] { String.valueOf(activity_id) });
+        db.delete(TABLE_ACTIVITY_DATA, KEY_ID + " = ?", new String[]{String.valueOf(activity_id)});
         db.close();
     }
 
@@ -467,13 +553,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void deleteActivityByDog(long dog_id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_ACTIVITY_DATA, KEY_DOG_ID + " = ?",new String[] { String.valueOf(dog_id) });
+        db.delete(TABLE_ACTIVITY_DATA, KEY_DOG_ID + " = ?", new String[]{String.valueOf(dog_id)});
         db.close();
     }
 
     /**
      * get datetime
-     * */
+     */
     private String getDateTime() {
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "yyyy-MM-dd HH:mm:ss", Locale.getDefault());

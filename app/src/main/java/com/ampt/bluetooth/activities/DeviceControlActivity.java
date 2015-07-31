@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ampt.bluetooth;
+package com.ampt.bluetooth.activities;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -34,6 +34,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.ampt.bluetooth.R;
+import com.ampt.bluetooth.SampleGattAttributes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
