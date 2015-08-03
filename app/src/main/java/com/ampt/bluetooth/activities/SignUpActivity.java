@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.greenrobot.event.EventBus;
 
 /**
  * Created by malith on 7/23/15.
@@ -121,8 +120,6 @@ public class SignUpActivity extends Activity {
                 Toast.makeText(SignUpActivity.this, "Saved successfully", Toast.LENGTH_SHORT).show();
                 if (id > 0) {
                     finish();
-                    EventBus bus = EventBus.getDefault();
-                    bus.post(user);
                     startActivity(new Intent(SignUpActivity.this, TabbedMainActivity.class));
                 }
             }

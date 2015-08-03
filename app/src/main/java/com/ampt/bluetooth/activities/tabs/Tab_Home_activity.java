@@ -15,9 +15,9 @@ public class Tab_Home_activity  extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.tab_home_layout);
 
         TextView txtView = new TextView(this);
         txtView.setText("Second Tab is Selected");
+        setContentView(R.layout.tab_home_layout);
     }
 }

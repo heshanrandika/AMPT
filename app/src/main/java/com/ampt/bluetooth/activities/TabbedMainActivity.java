@@ -24,7 +24,6 @@ public class TabbedMainActivity extends TabActivity{
         setContentView(R.layout.tab_main_layout);
 
 
-
         TabHost tabHost = getTabHost();
         TabHost.TabSpec spec;
         Intent intent;
