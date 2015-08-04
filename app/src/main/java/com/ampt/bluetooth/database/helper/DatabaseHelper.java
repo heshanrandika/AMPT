@@ -187,7 +187,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         byte[] image = null;
         Cursor cursor = db.query(TABLE_IMAGES, new String[]{ KEY_IMAGE_DATA}, KEY_ID + "=?", new String[]{String.valueOf(user_id)}, null, null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
-
             image = cursor.getBlob(0);
         }
         db.close();
