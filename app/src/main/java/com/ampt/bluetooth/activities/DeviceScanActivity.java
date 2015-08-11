@@ -36,7 +36,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ampt.bluetooth.AddOrEditDogProfile;
 import com.ampt.bluetooth.R;
 import com.ampt.bluetooth.database.helper.DatabaseHelper;
 
@@ -153,16 +152,16 @@ public class DeviceScanActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         final BluetoothDevice device = mLeDeviceListAdapter.getDevice(position);
-        if (device == null) return;
-        final Intent intent = new Intent(this, AddOrEditDogProfile.class);
-        intent.putExtra(AddOrEditDogProfile.EXTRAS_DEVICE_NAME, device.getName());
-        intent.putExtra(AddOrEditDogProfile.EXTRAS_DEVICE_ADDRESS, device.getAddress());
-        intent.putExtra(AddOrEditDogProfile.EXTRAS_EDIT_OR_SAVE, AddOrEditDogProfile.EXTRAS_SAVE);
-        if (mScanning) {
-            mBluetoothAdapter.stopLeScan(mLeScanCallback);
-            mScanning = false;
-        }
-        startActivity(intent);
+//        if (device == null) return;
+//        final Intent intent = new Intent(this, AddOrEditDogProfile.class);
+//        intent.putExtra(AddOrEditDogProfile.EXTRAS_DEVICE_NAME, device.getName());
+//        intent.putExtra(AddOrEditDogProfile.EXTRAS_DEVICE_ADDRESS, device.getAddress());
+//        intent.putExtra(AddOrEditDogProfile.EXTRAS_EDIT_OR_SAVE, AddOrEditDogProfile.EXTRAS_SAVE);
+//        if (mScanning) {
+//            mBluetoothAdapter.stopLeScan(mLeScanCallback);
+//            mScanning = false;
+//        }
+//        startActivity(intent);
     }
     private  void deviceAddressList(){
         deviceList = daf.getAllDeviceAddress();

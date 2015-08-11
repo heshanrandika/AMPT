@@ -21,7 +21,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.ampt.bluetooth.AddOrEditDogProfile;
 import com.ampt.bluetooth.R;
 import com.ampt.bluetooth.SampleGattAttributes;
 import com.ampt.bluetooth.chartView;
@@ -67,7 +66,7 @@ public class DogProfileControlActivity extends Activity {
     private ImageButton swimBtn;
     private ImageButton plyBtn;
 
-    private byte[] img;
+    private String img;
     private long dog_id;
     private String mDeviceName;
     private String mDeviceAddress;
@@ -178,12 +177,12 @@ public class DogProfileControlActivity extends Activity {
         dogImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Intent intent = new Intent(DogProfileControlActivity.this, AddOrEditDogProfile.class);
-                intent.putExtra(AddOrEditDogProfile.EXTRAS_DEVICE_NAME, mDeviceName);
-                intent.putExtra(AddOrEditDogProfile.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
-                intent.putExtra(AddOrEditDogProfile.EXTRAS_EDIT_OR_SAVE, AddOrEditDogProfile.EXTRAS_EDIT);
-
-                startActivity(intent);
+//                final Intent intent = new Intent(DogProfileControlActivity.this, AddOrEditDogProfile.class);
+//                intent.putExtra(AddOrEditDogProfile.EXTRAS_DEVICE_NAME, mDeviceName);
+//                intent.putExtra(AddOrEditDogProfile.EXTRAS_DEVICE_ADDRESS, mDeviceAddress);
+//                intent.putExtra(AddOrEditDogProfile.EXTRAS_EDIT_OR_SAVE, AddOrEditDogProfile.EXTRAS_EDIT);
+//
+//                startActivity(intent);
             }
         });
         onCollarClick.setOnClickListener(new View.OnClickListener() {
@@ -270,11 +269,11 @@ public class DogProfileControlActivity extends Activity {
         if(dogProfileData != null){
             dogName.setText(dogProfileData.getName());
            // dogAge.setText(dogProfileData.getAge() + "");
-            img = dogProfileData.getImage();
+            img = dogProfileData.getImageID();
             if(img != null){
-                ByteArrayInputStream imageStream = new ByteArrayInputStream(img);
-                Bitmap theImage = BitmapFactory.decodeStream(imageStream);
-                dogImage.setImageBitmap(theImage);
+//                ByteArrayInputStream imageStream = new ByteArrayInputStream(img);
+//                Bitmap theImage = BitmapFactory.decodeStream(imageStream);
+//                dogImage.setImageBitmap(theImage);
 
             }
             setActivityData();

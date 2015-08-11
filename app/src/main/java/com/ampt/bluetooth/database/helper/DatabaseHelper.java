@@ -14,6 +14,7 @@ import com.ampt.bluetooth.database.model.DogsData;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -47,6 +48,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_DEVICE_NAME = "device_name";
     private static final String KEY_DEVICE_ADDRESS = "device_address";
     private static final String KEY_GOAL = "goal";
+    private static final String KEY_BREED = "breed";
+    private static final String KEY_GENDER = "gender";
+    private static final String KEY_DOB = "dob";
 
 
     // TABLE_ACTIVITY_DATA  - column names
@@ -85,10 +89,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_DOGS_DATA = "CREATE TABLE "
             + TABLE_DOGS_DATA + "("
             + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-            + KEY_NAME + " TEXT,"
+            + KEY_NAME + " TEXT NOT NULL,"
             + KEY_GOAL + " TEXT,"
             + KEY_AGE + " INTEGER,"
-            + KEY_IMAGE + " BLOB,"
+            + KEY_IMAGEID + " TEXT NOT NULL,"
+            + KEY_BREED + " TEXT NOT NULL,"
+            + KEY_GENDER + " TEXT NOT NULL,"
+            + KEY_DOB + " TEXT,"
             + KEY_DEVICE_NAME + " TEXT,"
             + KEY_DEVICE_ADDRESS + " TEXT,"
             + KEY_STATUS + " INTEGER,"
@@ -168,11 +175,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //save image
-    public long saveImage(byte[] image){
+    public long saveImage(byte[] image) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_IMAGE_DATA,image);
+        values.put(KEY_IMAGE_DATA, image);
 
 
         // Inserting Row
@@ -185,7 +192,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public byte[] getImage(long user_id) {
         SQLiteDatabase db = this.getReadableDatabase();
         byte[] image = null;
-        Cursor cursor = db.query(TABLE_IMAGES, new String[]{ KEY_IMAGE_DATA}, KEY_ID + "=?", new String[]{String.valueOf(user_id)}, null, null, null, null);
+        Cursor cursor = db.query(TABLE_IMAGES, new String[]{KEY_IMAGE_DATA}, KEY_ID + "=?", new String[]{String.valueOf(user_id)}, null, null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
             image = cursor.getBlob(0);
         }
@@ -204,9 +211,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_NAME, data.getName());
         values.put(KEY_GOAL, data.getGoal());
         values.put(KEY_AGE, data.getAge());
-        values.put(KEY_IMAGE, data.getImage());
+        values.put(KEY_IMAGEID, data.getImageID());
         values.put(KEY_DEVICE_NAME, data.getDeviceName());
         values.put(KEY_DEVICE_ADDRESS, data.getDeviceAddress());
+        values.put(KEY_BREED, data.getBreed());
+        values.put(KEY_DOB, data.getDob());
+        values.put(KEY_GENDER, data.getGender());
         values.put(KEY_STATUS, 0);
         values.put(KEY_CREATED_AT, getDateTime());
 
@@ -236,9 +246,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             dogProfile.setName((c.getString(c.getColumnIndex(KEY_NAME))));
             dogProfile.setGoal((c.getString(c.getColumnIndex(KEY_GOAL))));
             dogProfile.setAge((c.getInt(c.getColumnIndex(KEY_AGE))));
-            dogProfile.setImage((c.getBlob(c.getColumnIndex(KEY_IMAGE))));
+            dogProfile.setImageID((c.getString(c.getColumnIndex(KEY_IMAGEID))));
             dogProfile.setDeviceName((c.getString(c.getColumnIndex(KEY_DEVICE_NAME))));
             dogProfile.setDeviceAddress((c.getString(c.getColumnIndex(KEY_DEVICE_ADDRESS))));
+            dogProfile.setBreed((c.getString(c.getColumnIndex(KEY_BREED))));
+            dogProfile.setDob((c.getString(c.getColumnIndex(KEY_DOB))));
+            dogProfile.setGender((c.getString(c.getColumnIndex(KEY_GENDER))));
             dogProfile.setStatus(false);
             dogProfile.setCreatedAt(c.getString(c.getColumnIndex(KEY_CREATED_AT)));
 
@@ -270,6 +283,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             dogProfile.setName((c.getString(c.getColumnIndex(KEY_NAME))));
             dogProfile.setGoal((c.getString(c.getColumnIndex(KEY_GOAL))));
             dogProfile.setAge((c.getInt(c.getColumnIndex(KEY_AGE))));
+            dogProfile.setBreed((c.getString(c.getColumnIndex(KEY_BREED))));
+            dogProfile.setDob((c.getString(c.getColumnIndex(KEY_DOB))));
+            dogProfile.setGender((c.getString(c.getColumnIndex(KEY_GENDER))));
+            dogProfile.setImageID((c.getString(c.getColumnIndex(KEY_IMAGEID))));
 
             db.close();
             return dogProfile;
@@ -288,7 +305,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String selectQuery = "SELECT  * FROM " + TABLE_DOGS_DATA + " WHERE "
                 + KEY_DEVICE_ADDRESS + " = " + "\"" + deviceAddress + "\"";
 
-        Log.e(LOG, selectQuery);
+        Log.i(LOG, selectQuery);
         //Cursor c = db.query(TABLE_DOGS_DATA, null, KEY_DEVICE_ADDRESS + "=?",new String[] { deviceAddress }, null, null, null, null);
         Cursor c = db.rawQuery(selectQuery, null);
 
@@ -298,9 +315,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             dogProfile.setName((c.getString(c.getColumnIndex(KEY_NAME))));
             dogProfile.setGoal((c.getString(c.getColumnIndex(KEY_GOAL))));
             dogProfile.setAge((c.getInt(c.getColumnIndex(KEY_AGE))));
-            dogProfile.setImage((c.getBlob(c.getColumnIndex(KEY_IMAGE))));
+            dogProfile.setImageID((c.getString(c.getColumnIndex(KEY_IMAGEID))));
             dogProfile.setDeviceName((c.getString(c.getColumnIndex(KEY_DEVICE_NAME))));
             dogProfile.setDeviceAddress((c.getString(c.getColumnIndex(KEY_DEVICE_ADDRESS))));
+            dogProfile.setBreed((c.getString(c.getColumnIndex(KEY_BREED))));
+            dogProfile.setDob((c.getString(c.getColumnIndex(KEY_DOB))));
+            dogProfile.setGender((c.getString(c.getColumnIndex(KEY_GENDER))));
             dogProfile.setStatus(false);
             dogProfile.setCreatedAt(c.getString(c.getColumnIndex(KEY_CREATED_AT)));
 
@@ -318,31 +338,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /**
      * getting all DogProfile
      */
-    public ArrayList<DogsData> getAllDogProfile() {
-        ArrayList<DogsData> dogList = new ArrayList<DogsData>();
+    public List<DogsData> getAllDogProfile() {
+        List<DogsData> dogList = new ArrayList<DogsData>();
         String selectQuery = "SELECT  * FROM " + TABLE_DOGS_DATA;
 
-        Log.e(LOG, selectQuery);
+        Log.i(LOG, selectQuery);
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
-
         // looping through all rows and adding to list
         if (c != null && c.moveToFirst()) {
+            Log.i(LOG, "cursor size : " + c.getCount());
             do {
                 DogsData dogProfile = new DogsData();
-                dogProfile.setId(c.getInt(c.getColumnIndex(KEY_ID)));
+                dogProfile.setId(c.getLong(c.getColumnIndex(KEY_ID)));
                 dogProfile.setName((c.getString(c.getColumnIndex(KEY_NAME))));
                 dogProfile.setGoal((c.getString(c.getColumnIndex(KEY_GOAL))));
                 dogProfile.setAge((c.getInt(c.getColumnIndex(KEY_AGE))));
-                dogProfile.setImage((c.getBlob(c.getColumnIndex(KEY_IMAGE))));
+                dogProfile.setImageID((c.getString(c.getColumnIndex(KEY_IMAGEID))));
                 dogProfile.setDeviceName((c.getString(c.getColumnIndex(KEY_DEVICE_NAME))));
                 dogProfile.setDeviceAddress((c.getString(c.getColumnIndex(KEY_DEVICE_ADDRESS))));
+                dogProfile.setBreed((c.getString(c.getColumnIndex(KEY_BREED))));
+                dogProfile.setDob((c.getString(c.getColumnIndex(KEY_DOB))));
+                dogProfile.setGender((c.getString(c.getColumnIndex(KEY_GENDER))));
                 dogProfile.setStatus(false);
                 dogProfile.setCreatedAt(c.getString(c.getColumnIndex(KEY_CREATED_AT)));
 
                 dogList.add(dogProfile);
             } while (c.moveToNext());
+        }else{
+            Log.i(LOG,"cursor did not move to 1st");
         }
         db.close();
         return dogList;
@@ -394,8 +419,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_NAME, data.getName());
         values.put(KEY_GOAL, data.getGoal());
         values.put(KEY_AGE, data.getAge());
-        values.put(KEY_IMAGE, data.getImage());
+        values.put(KEY_IMAGE, data.getImageID());
         values.put(KEY_STATUS, 0);
+        values.put(KEY_BREED, data.getBreed());
+        values.put(KEY_DOB, data.getDob());
+        values.put(KEY_GENDER, data.getGender());
         values.put(KEY_CREATED_AT, getDateTime());
 
 

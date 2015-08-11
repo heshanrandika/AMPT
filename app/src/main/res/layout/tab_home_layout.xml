@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
 
     <de.hdodenhof.circleimageview.CircleImageView
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/profile_image"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
+        android:layout_width="170dp"
+        android:layout_height="170dp"
         android:src="@drawable/dog_profile"
         app:border_width="1dp"
         app:border_color="#FF000000"
+        android:layout_marginTop="10dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
@@ -24,13 +26,13 @@
 
         android:background="@drawable/circle_textview_yello"
         android:gravity="center"
-        android:text="My name is NON"
+        android:text="ENGAGE"
         android:textColor="#FFFFFF"
         android:layout_marginLeft="10dp"
-        android:textSize="10dp"
-        android:layout_marginBottom="63dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:textSize="20dp"
+        android:layout_below="@+id/num_txt4"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="24dp" />
 
 
     <TextView
@@ -38,13 +40,13 @@
         android:layout_width="85dp"
         android:layout_height="85dp"
 
-        android:background="@drawable/circle_textview_yello"
+        android:background="@drawable/circle_textview_blue"
         android:gravity="center"
-        android:text="My name is NON"
+        android:text="Walk \n 40/50"
         android:textColor="#FFFFFF"
         android:layout_marginLeft="10dp"
-        android:textSize="10dp"
-        android:layout_below="@+id/profile_image"
+        android:textSize="15dp"
+        android:layout_alignTop="@+id/num_txt2"
         android:layout_toStartOf="@+id/profile_image" />
 
     <TextView
@@ -52,14 +54,14 @@
         android:layout_width="85dp"
         android:layout_height="85dp"
 
-        android:background="@drawable/circle_textview_blue"
+        android:background="@drawable/circle_textview_yello"
         android:gravity="center"
-        android:text="My name is NON"
+        android:text="Play \n 20/50"
         android:textColor="#FFFFFF"
-        android:layout_marginLeft="10dp"
-        android:textSize="10dp"
-        android:layout_below="@+id/profile_image"
-        android:layout_toEndOf="@+id/profile_image" />
+        android:textSize="15dp"
+        android:layout_alignBottom="@+id/num_txt4"
+        android:layout_toEndOf="@+id/profile_image"
+        android:layout_marginBottom="66dp" />
 
     <TextView
         android:id="@+id/num_txt4"
@@ -68,12 +70,11 @@
 
         android:background="@drawable/circle_textview_ash"
         android:gravity="center"
-        android:text="My name is NON"
+        android:text="Rest \n 7:24"
         android:textColor="#FFFFFF"
-        android:layout_marginLeft="10dp"
-        android:textSize="10dp"
+        android:layout_marginTop="10dp"
+        android:textSize="15dp"
         android:layout_below="@+id/profile_image"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="35dp" />
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

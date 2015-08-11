@@ -4,15 +4,18 @@ package com.ampt.bluetooth.database.model;
  * Created by Heshanr on 4/15/2015.
  */
 public class DogsData {
-    int id;
-    String name;
-    byte[] image;
-    boolean status;
-    String device_name;
-    String device_address;
-    int age;
-    String created_at;
-    String goal;
+    private long id;
+    private String name;
+    private String imageID;
+    private boolean status;
+    private String device_name;
+    private String device_address;
+    private int age;
+    private String created_at;
+    private String goal;
+    private String gender;
+    private String dob;
+    private String breed;
 
     public DogsData() {
     }
@@ -47,11 +50,11 @@ public class DogsData {
         this.created_at = created_at;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -71,12 +74,12 @@ public class DogsData {
         this.name = name;
     }
 
-    public byte[] getImage() {
-        return image;
+    public String getImageID() {
+        return imageID;
     }
 
-    public void setImage(byte[] image) {
-        this.image = image;
+    public void setImageID(String imageID) {
+        this.imageID = imageID;
     }
 
     public boolean isStatus() {
@@ -93,5 +96,29 @@ public class DogsData {
 
     public void setDeviceName(String device_name) {
         this.device_name = device_name;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getDob() {
+        return dob;
+    }
+
+    public void setDob(String dob) {
+        this.dob = dob;
+    }
+
+    public String getBreed() {
+        return breed;
+    }
+
+    public void setBreed(String breed) {
+        this.breed = breed;
     }
 }

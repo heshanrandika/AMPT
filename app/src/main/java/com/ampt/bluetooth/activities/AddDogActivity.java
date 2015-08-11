@@ -12,125 +12,142 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.Spinner;
 
 import com.ampt.bluetooth.R;
 import com.ampt.bluetooth.Util.CustomToast;
-import com.ampt.bluetooth.bean.User;
 import com.ampt.bluetooth.database.helper.DatabaseHelper;
+import com.ampt.bluetooth.database.model.DogsData;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Created by malith on 7/23/15.
+ * Created by malith on 8/6/15.
  */
-public class SignUpActivity extends Activity {
-    private Pattern pattern;
-    private Matcher matcher;
-    private static final String EMAIL_PATTERN =
-            "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
-                    + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-    EditText ename;
-    EditText elastname;
-    EditText eemail;
-    EditText epassword;
+public class AddDogActivity extends Activity {
+
     protected static final int CAMERA_REQUEST = 0;
     protected static final int GALLERY_PICTURE = 1;
-    ImageView img_logo;
-    byte[] imageData = null;
+    private byte[] dogImageData = null;
+    private ImageView iv_dog_image;
+    private EditText nameOfDog;
+    private EditText age;
+    private Spinner gender;
+    private EditText dateOfBirth;
+    private EditText breed;
+    private EditText goal;
+    private EditText deviceName;
+    private EditText deviceID;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.signup_layout);
-        pattern = Pattern.compile(EMAIL_PATTERN);
+        setContentView(R.layout.add_new_dog);
+        iv_dog_image = (ImageView) findViewById(R.id.add_new_dog_activity_dog_imageView);
+        nameOfDog = (EditText) findViewById(R.id.add_new_dog_activity_dog_name);
+        age = (EditText) findViewById(R.id.add_new_dog_activity_age);
+        gender = (Spinner) findViewById(R.id.add_new_dog_activity_sppinder_gender);
+        dateOfBirth = (EditText) findViewById(R.id.add_new_dog_activity_date_of_birth);
+        breed = (EditText) findViewById(R.id.add_new_dog_activity_breed);
+        goal = (EditText) findViewById(R.id.add_new_dog_activity_goal);
+        deviceName = (EditText) findViewById(R.id.add_new_dog_activity_device_name);
+        deviceID = (EditText) findViewById(R.id.add_new_dog_activity_device_id);
 
 
-        ename = (EditText) findViewById(R.id.signupActivity_name);
-        elastname = (EditText) findViewById(R.id.signupActivity_lastname);
-        eemail = (EditText) findViewById(R.id.signupActivity_email);
-        epassword = (EditText) findViewById(R.id.signupActivity_password);
-
-        img_logo = (ImageView) findViewById(R.id.SignUpActivityProfilePic);
-        img_logo.setOnClickListener(new View.OnClickListener() {
+        iv_dog_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startDialog();
             }
         });
 
-        Button create = (Button) findViewById(R.id.signupActivity_create);
+        List<String> list = new ArrayList<String>();
+        list.add("Male");
+        list.add("Female");
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, list);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        gender.setAdapter(dataAdapter);
 
-        create.setOnClickListener(new View.OnClickListener() {
+
+        Button save = (Button) findViewById(R.id.add_new_dog_activity_save_button);
+        save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String name = ename.getText().toString();
-                String lastname = elastname.getText().toString();
-                String email = eemail.getText().toString();
-                String password = epassword.getText().toString();
-                if (null == name || name.equals("")) {
-                    CustomToast.showToast(SignUpActivity.this, "Name can't be empty",R.layout.error_toast_layout);
+
+                String _nameOfDog = nameOfDog.getText().toString();
+                String _age = age.getText().toString();
+                String _gender = String.valueOf(gender.getSelectedItem());
+                String _dateOfBirth = dateOfBirth.getText().toString();
+                String _breed = breed.getText().toString();
+                String _goal = goal.getText().toString();
+                String _deviceName = deviceName.getText().toString();
+                String _deviceId = deviceID.getText().toString();
+
+
+                if (null == dogImageData) {
+                    CustomToast.showToast(AddDogActivity.this, "Please Select an Image", R.layout.error_toast_layout);
                     return;
                 }
-                if (null == lastname || lastname.equals("")) {
-                    CustomToast.showToast(SignUpActivity.this,"Last name can't be empty" ,R.layout.error_toast_layout);
+                if (null == _nameOfDog || _nameOfDog.equals("")) {
+                    CustomToast.showToast(AddDogActivity.this, "Please Enter name of the dog", R.layout.error_toast_layout);
                     return;
                 }
-                if (null == email || email.equals("")) {
-                    CustomToast.showToast(SignUpActivity.this,"Email can't be empty ",R.layout.error_toast_layout);
+                if (null == _age || _age.equals("")) {
+                    CustomToast.showToast(AddDogActivity.this, "Please set age of the dog", R.layout.error_toast_layout);
                     return;
-                } else {
-                    matcher = pattern.matcher(email);
-                    boolean isMatched = matcher.matches();
-                    if (!isMatched) {
-                        CustomToast.showToast(SignUpActivity.this,"Invalid Email" ,R.layout.error_toast_layout);
-                    }
                 }
-                if (null == password || password.equals("")) {
-                    CustomToast.showToast(SignUpActivity.this, "Password can't be empty",R.layout.error_toast_layout);
+                if (null == _breed || _breed.equals("")) {
+                    CustomToast.showToast(AddDogActivity.this, "Please set breed of the dog", R.layout.error_toast_layout);
                     return;
                 }
 
-                DatabaseHelper dbh = new DatabaseHelper(SignUpActivity.this);
-                User usr = dbh.getUser(email);
-                if (null != usr) {
-                    if (usr.getEmail().equals(email)) {
-                        CustomToast.showToast(SignUpActivity.this, "Already Registered",R.layout.error_toast_layout);
-                        return;
-                    }
-
+                DatabaseHelper dbh = new DatabaseHelper(AddDogActivity.this);
+                long imageID = dbh.saveImage(dogImageData);
+                if (imageID < 0) {
+                    CustomToast.showToast(AddDogActivity.this, "Something went wrong,please try again ", R.layout.error_toast_layout);
+                    return;
                 }
-
-                long imageId = -1;
-                if (null != imageData) {
-                    imageId = dbh.saveImage(imageData);
-                }
-                User user=new User(name, lastname, email, password, imageId);
-                long id = dbh.addUser(user);
-                System.out.println("User is saved : " + id +" and user image is saved : "+imageId);
-                Toast.makeText(SignUpActivity.this, "Saved successfully", Toast.LENGTH_SHORT).show();
-                CustomToast.showToast(SignUpActivity.this,"Saved successfully", R.layout.message_toast_layout);
-                if (id > 0) {
+                DogsData dog = new DogsData();
+                dog.setName(_nameOfDog);
+                dog.setImageID(String.valueOf(imageID));
+                dog.setGender(_gender);
+                dog.setDob(_dateOfBirth == null ? "Unknown" : _dateOfBirth);
+                dog.setBreed(_breed == null ? "Unknown" : _breed);
+                dog.setAge(Integer.parseInt(_age));
+                dog.setDeviceAddress(_deviceId == null ? "Unknown" : _deviceId);
+                dog.setDeviceName(_deviceName == null ? "Unknown" : _deviceName);
+                dog.setGoal(_goal == null ? "Unknown" : _goal);
+                long dogRowId = dbh.addDog(dog);
+                if (dogRowId > 0) {
+                    CustomToast.showToast(AddDogActivity.this, "Saved Successfully ", R.layout.message_toast_layout);
+                    Intent i = getIntent(); //gets the intent that called this intent
+                    setResult(123, i);
                     finish();
-                    startActivity(new Intent(SignUpActivity.this, TabbedMainActivity.class));
+                } else {
+                    CustomToast.showToast(AddDogActivity.this, "Something went wrong,please try again ", R.layout.error_toast_layout);
                 }
+
+
             }
         });
+
     }
+
 
     private void startDialog() {
         final CharSequence[] items = {"Take Photo", "Choose from Library", "Cancel"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(AddDogActivity.this);
         builder.setTitle("Add Photo!");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
@@ -177,8 +194,8 @@ public class SignUpActivity extends Activity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                img_logo.setImageBitmap(thumbnail);
-                imageData = bytes.toByteArray();
+                iv_dog_image.setImageBitmap(thumbnail);
+                dogImageData = bytes.toByteArray();
             } else if (requestCode == GALLERY_PICTURE) {
                 Uri selectedImageUri = data.getData();
                 String[] projection = {MediaStore.MediaColumns.DATA};
@@ -199,12 +216,12 @@ public class SignUpActivity extends Activity {
                 options.inSampleSize = scale;
                 options.inJustDecodeBounds = false;
                 thumbnail = BitmapFactory.decodeFile(selectedImagePath, options);
-                img_logo.setImageBitmap(thumbnail);
+                iv_dog_image.setImageBitmap(thumbnail);
 
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 thumbnail.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                imageData = stream.toByteArray();
-                System.out.println(imageData.length);
+                dogImageData = stream.toByteArray();
+                System.out.println(dogImageData.length);
             }
         }
     }

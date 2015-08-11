@@ -11,7 +11,7 @@ import com.ampt.bluetooth.database.helper.DatabaseHelper;
 /**
  * Created by malith on 8/4/15.
  */
-public class LoadImage extends AsyncTask<Integer, Void, Bitmap> {
+public class LoadImage extends AsyncTask<Long, Void, Bitmap> {
     private Context context;
 
     public LoadImage(Context con) {
@@ -19,11 +19,11 @@ public class LoadImage extends AsyncTask<Integer, Void, Bitmap> {
     }
 
     @Override
-    protected Bitmap doInBackground(Integer... params) {
-        int id = params[0];
+    protected Bitmap doInBackground(Long... params) {
+        long id = params[0];
         DatabaseHelper dbh = new DatabaseHelper(context);
         byte[] imageBytes = dbh.getImage(id);
-        if(null==imageBytes){
+        if (null == imageBytes) {
             return BitmapFactory.decodeResource(context.getResources(), R.drawable.dog_profile);
         }
         return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);

@@ -26,11 +26,15 @@
     </style>
 
     <style name="plotStyle1">
+        <item name="colorAccent">#Face34</item>
         <!--<item name="androidplot.title">Default Title</item>
         <item name="androidplot.domainLabel">my domain</item>-->
         <!--<item name="XYPlot:androidplot.title">my domain</item>-->
     </style>
-
-
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!--<item name="colorPrimary">@color/primary</item>-->
+        <!--<item name="colorPrimaryDark">@color/primary_dark</item>-->
+        <!--<item name="colorAccent">@color/accent</item>-->
+    </style>
 
 </resources>

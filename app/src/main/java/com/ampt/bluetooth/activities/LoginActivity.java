@@ -46,19 +46,19 @@ public class LoginActivity extends Activity {
         });
 
 
-        TextView signIn= (TextView) findViewById(R.id.textViewSignIn);
-        signIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, SignInActivity.class));
-            }
-        });
-
-        Button signUp = (Button) findViewById(R.id.signupButton);
-        signUp.setOnClickListener(new View.OnClickListener() {
+        TextView signup= (TextView) findViewById(R.id.textViewSignup);
+        signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
+            }
+        });
+
+        Button signin = (Button) findViewById(R.id.signinButton);
+        signin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LoginActivity.this, SignInActivity.class));
             }
         });
 }

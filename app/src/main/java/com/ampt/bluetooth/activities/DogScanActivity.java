@@ -45,6 +45,7 @@ import com.ampt.bluetooth.database.model.DogsData;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Activity for scanning and displaying available Bluetooth LE devices.
@@ -98,7 +99,7 @@ public class DogScanActivity extends ListActivity {
     }
 
     private void getDogListFromDB() {
-        ArrayList<DogsData> persistList = daf.getAllDogProfile();
+        List<DogsData> persistList = daf.getAllDogProfile();
         if(persistList.size()>0){
             for(DogsData dd : persistList){
                 mLeDeviceListAdapter.addDevice(dd);
@@ -327,11 +328,11 @@ public class DogScanActivity extends ListActivity {
                     viewHolder.dogGoal.setText(dogsDataGoal);
                 else
                     viewHolder.dogGoal.setText("");
-                if(dogsData.getImage() !=  null){
-                    byte[] outImage=dogsData.getImage();
-                    ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
-                    Bitmap theImage = BitmapFactory.decodeStream(imageStream);
-                    viewHolder.dogImage.setImageBitmap(theImage);
+                if(dogsData.getImageID() !=  null){
+//                    byte[] outImage=dogsData.getImageID();
+//                    ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
+//                    Bitmap theImage = BitmapFactory.decodeStream(imageStream);
+//                    viewHolder.dogImage.setImageBitmap(theImage);
                 }else{
                     viewHolder.dogImage.setImageResource(R.drawable.pack_btn);
                 }
