@@ -33,10 +33,10 @@ public class SignInActivity extends Activity {
         pattern = Pattern.compile(EMAIL_PATTERN);
 
         final EditText eemail = (EditText) findViewById(R.id.signInActivity_email);
-        eemail.setText("m@g.com");
+        eemail.setHint("m@g.com");
 
         final EditText epassword = (EditText) findViewById(R.id.signInActivity_password);
-        epassword.setText("asd");
+        epassword.setHint("asd");
         Button signin = (Button) findViewById(R.id.signInActivity_signin_Button);
 
         signin.setOnClickListener(new View.OnClickListener() {

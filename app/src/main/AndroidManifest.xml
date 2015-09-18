@@ -41,7 +41,8 @@
         <activity
             android:name=".activities.DeviceScanActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.DarkActionBar" />
         <!--        <activity
                     android:name=".AddOrEditDogProfile"
                     android:configChanges="orientation"

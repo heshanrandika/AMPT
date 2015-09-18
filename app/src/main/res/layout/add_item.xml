@@ -5,23 +5,29 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:weightSum="1"
-        android:background="@drawable/add_item_border">
+        android:gravity="center_horizontal">
 
-        <ImageView
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:id="@+id/imageView2"
-            android:layout_weight="0.4"
-            android:src="@drawable/add_dog"/>
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:gravity="center_horizontal"
+            android:background="#ebe4ec">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="41dp"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/add_item"
-            android:id="@+id/textView4"
-            android:layout_gravity="center_vertical" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/add_item"
+                android:id="@+id/textView7"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:textColor="#3ba3b1"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp" />
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

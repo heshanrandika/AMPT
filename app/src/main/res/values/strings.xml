@@ -45,7 +45,8 @@
     <string name="blue_slide">Blue</string>
     <string name="green_slide">Green</string>
 
-    <string name="add_item">Add New Dog</string>
+    <string name="add_item">ADD NEW DEVICE</string>
+    <string name="item_name">AMPT ANIMAL 9330</string>
 
     <!-- Add Dog Profile -->
     <string name="camera_btn">Select Image</string>

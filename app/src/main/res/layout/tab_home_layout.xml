@@ -47,7 +47,7 @@
         android:layout_marginLeft="10dp"
         android:textSize="15dp"
         android:layout_alignTop="@+id/num_txt2"
-        android:layout_toStartOf="@+id/profile_image" />
+        android:layout_toStartOf="@id/profile_image" />
 
     <TextView
         android:id="@+id/num_txt2"

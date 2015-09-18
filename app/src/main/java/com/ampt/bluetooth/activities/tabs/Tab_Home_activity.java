@@ -9,7 +9,8 @@ import android.widget.ImageView;
 import com.ampt.bluetooth.R;
 import com.ampt.bluetooth.Util.ImageSetter;
 import com.ampt.bluetooth.Util.SharedPref;
-import com.ampt.bluetooth.activities.AddDogActivity;
+//import com.ampt.bluetooth.activities.AddDogActivity;
+import com.ampt.bluetooth.activities.DeviceScanActivity;
 import com.ampt.bluetooth.database.helper.DatabaseHelper;
 import com.ampt.bluetooth.database.model.DogsData;
 
@@ -43,7 +44,7 @@ public class Tab_Home_activity extends Activity {
             System.out.println("ccccccccccccccccccc    "+Long.parseLong(dogsData.getImageID()));
             ImageSetter.setImage(this, iv, Long.parseLong(dogsData.getImageID()));
         } else {
-            startActivity(new Intent(context, AddDogActivity.class));
+          //  startActivity(new Intent(context, DeviceScanActivity.class));
         }
     }
 
