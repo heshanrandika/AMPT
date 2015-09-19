@@ -157,7 +157,7 @@ public class DogProfileControlActivity extends Activity {
 
         dogImage = (ImageView) findViewById(R.id.profile_image_btn);
        // editProfile = (ImageButton) findViewById(R.id.edit_profile_btn);
-        onCollarClick = (ImageButton) findViewById(R.id.on_coller_click);
+    //    onCollarClick = (ImageButton) findViewById(R.id.on_coller_click);
        // archivedBtn = (ImageButton) findViewById(R.id.archived_btn);
         syncBtn = (ImageButton) findViewById(R.id.sync_btn);
         activityBtn = (ImageButton) findViewById(R.id.activity_btn);

@@ -16,16 +16,21 @@
 
 package com.ampt.bluetooth.activities;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,6 +44,7 @@ import android.widget.Toast;
 import com.ampt.bluetooth.R;
 import com.ampt.bluetooth.database.helper.DatabaseHelper;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 /**
@@ -81,7 +87,13 @@ public class DeviceScanActivity extends ListActivity {
             finish();
             return;
         }
+
+
     }
+
+
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -117,6 +129,9 @@ public class DeviceScanActivity extends ListActivity {
     protected void onResume() {
         super.onResume();
         deviceAddressList();
+        IntentFilter inf = new IntentFilter();
+        inf.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+        registerReceiver(broadcastReceiver,inf);
         // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
         // fire an intent to display a dialog asking the user to grant permission to enable it.
         if (!mBluetoothAdapter.isEnabled()) {
@@ -149,10 +164,43 @@ public class DeviceScanActivity extends ListActivity {
         mLeDeviceListAdapter.clear();
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         final BluetoothDevice device = mLeDeviceListAdapter.getDevice(position);
         if (device == null) return;
+        if(device.getBondState() == 10){
+            device.createBond();
+        }else{
+            gotoNext(device);
+        }
+/*
+        boolean k = true;
+        for(int times =0 ; times<3; times++){
+            if(device.getBondState() != 12){
+
+            }
+            Toast.makeText(DeviceScanActivity.this, "Invalid PIN", Toast.LENGTH_SHORT).show();
+            k = device.createBond();
+            System.out.println(k);
+        }
+*/
+
+        //Intent intent = new Intent(device.ACTION_BOND_STATE_CHANGED);
+       // startActivityForResult(intent, 1234);
+
+       /* boolean isBonded;
+        try {
+            isBonded = createBond(device);
+            if(isBonded)
+            {
+                Toast.makeText(DeviceScanActivity.this, "Successfully paired", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(DeviceScanActivity.this, "Invalid PIN", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*///connect(bdDevice);
        /* final Intent intent = new Intent(this, AddOrEditDogProfile.class);
         intent.putExtra(AddOrEditDogProfile.EXTRAS_DEVICE_NAME, device.getName());
         intent.putExtra(AddOrEditDogProfile.EXTRAS_DEVICE_ADDRESS, device.getAddress());
@@ -163,8 +211,49 @@ public class DeviceScanActivity extends ListActivity {
         }
         startActivity(intent);*/
     }
-    private  void deviceAddressList(){
+
+    public void gotoNext(BluetoothDevice device){
+        final Intent intent = new Intent(DeviceScanActivity.this, AddDogActivity.class);
+        intent.putExtra(AddDogActivity.DEVICE_ADDRESS, device.getAddress());
+        if (mScanning) {
+            mBluetoothAdapter.stopLeScan(mLeScanCallback);
+            mScanning = false;
+        }
+        startActivity(intent);
+    }
+
+    final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            System.out.println("ACTION: "+ action);
+            // When discovery finds a device
+
+         if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
+             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+           //  System.out.println("UPDATE Name " + device.getName() + " Value " + device.getAddress() + " Bond state " + device.getBondState());
+                if(device.getBondState() == 10){
+                    Toast.makeText(DeviceScanActivity.this, "Invalid PIN", Toast.LENGTH_SHORT).show();
+                }else if(device.getBondState() == 12){
+                    Toast.makeText(DeviceScanActivity.this, "Successfully paired", Toast.LENGTH_SHORT).show();
+                    gotoNext(device);
+                }
+            }
+        }
+    };
+
+
+    private  void deviceAddressList() {
         deviceList = daf.getAllDeviceAddress();
+    }
+
+    public boolean createBond(BluetoothDevice btDevice)
+            throws Exception
+    {
+        Class class1 = Class.forName("android.bluetooth.BluetoothDevice");
+        Method createBondMethod = class1.getMethod("createBond");
+        Boolean returnValue = (Boolean) createBondMethod.invoke(btDevice);
+        return returnValue.booleanValue();
     }
 
     private void scanLeDevice(final boolean enable) {
@@ -187,7 +276,12 @@ public class DeviceScanActivity extends ListActivity {
         }
         invalidateOptionsMenu();
     }
-
+    @Override
+    protected void onStop() {
+        // TODO Auto-generated method stub
+        unregisterReceiver(broadcastReceiver);
+        super.onStop();
+    }
     // Adapter for holding devices found through scanning.
     private class LeDeviceListAdapter extends BaseAdapter {
         private ArrayList<BluetoothDevice> mLeDevices;

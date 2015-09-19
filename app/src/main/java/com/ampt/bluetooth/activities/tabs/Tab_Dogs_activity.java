@@ -53,6 +53,7 @@ public class Tab_Dogs_activity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        setAdapter();
 
     }
 

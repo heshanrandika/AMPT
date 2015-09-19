@@ -35,6 +35,7 @@ import java.util.List;
  * Created by malith on 8/6/15.
  */
 public class AddDogActivity extends Activity {
+    public static final String DEVICE_ADDRESS = "DEVICE_ADDRESS";
 
     protected static final int CAMERA_REQUEST = 0;
     protected static final int GALLERY_PICTURE = 1;
@@ -63,6 +64,8 @@ public class AddDogActivity extends Activity {
         deviceName = (EditText) findViewById(R.id.add_new_dog_activity_device_name);
         deviceID = (EditText) findViewById(R.id.add_new_dog_activity_device_id);
 
+        final Intent intent = getIntent();
+        deviceID.setText(intent.getStringExtra(DEVICE_ADDRESS));
 
         iv_dog_image.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,7 +95,7 @@ public class AddDogActivity extends Activity {
                 String _breed = breed.getText().toString();
                 String _goal = goal.getText().toString();
                 String _deviceName = deviceName.getText().toString();
-                String _deviceId = deviceID.getText().toString();
+                String _deviceAddress = deviceID.getText().toString();
 
 
                 if (null == dogImageData) {
@@ -125,7 +128,7 @@ public class AddDogActivity extends Activity {
                 dog.setDob(_dateOfBirth == null ? "Unknown" : _dateOfBirth);
                 dog.setBreed(_breed == null ? "Unknown" : _breed);
                 dog.setAge(Integer.parseInt(_age));
-                dog.setDeviceAddress(_deviceId == null ? "Unknown" : _deviceId);
+                dog.setDeviceAddress(_deviceAddress == null ? "Unknown" : _deviceAddress);
                 dog.setDeviceName(_deviceName == null ? "Unknown" : _deviceName);
                 dog.setGoal(_goal == null ? "Unknown" : _goal);
                 long dogRowId = dbh.addDog(dog);
