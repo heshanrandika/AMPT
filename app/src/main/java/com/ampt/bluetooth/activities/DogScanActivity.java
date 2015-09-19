@@ -17,15 +17,12 @@
 package com.ampt.bluetooth.activities;
 
 import android.app.Activity;
-import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -34,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -43,14 +41,13 @@ import com.ampt.bluetooth.R;
 import com.ampt.bluetooth.database.helper.DatabaseHelper;
 import com.ampt.bluetooth.database.model.DogsData;
 
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Activity for scanning and displaying available Bluetooth LE devices.
  */
-public class DogScanActivity extends ListActivity {
+public class DogScanActivity extends Activity {
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
@@ -60,14 +57,28 @@ public class DogScanActivity extends ListActivity {
     // Stops scanning after 10 seconds.
     private static final long SCAN_PERIOD = 10000;
     private static int deviceCount = 0;
-
+    ListView deviceList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        super.setContentView(R.layout.dog_scan_activity);
         getActionBar().setTitle(R.string.title_devices);
-        mHandler = new Handler();
+        deviceList = (ListView) findViewById(R.id.dog_scan_activity_list);
+        Button addNewDevice = (Button) findViewById(R.id.dog_scan_activity_add_new_device);
+        addNewDevice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            final Intent intent = new Intent(DogScanActivity.this, DeviceScanActivity.class);
+            if (mScanning) {
+                mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                mScanning = false;
+            }
+            startActivity(intent);
+            }
+        });
 
+        mHandler = new Handler();
 
 
         // Use this check to determine whether BLE is supported on the device.  Then you can
@@ -94,15 +105,15 @@ public class DogScanActivity extends ListActivity {
 
     private void getDogListFromDB() {
         List<DogsData> persistList = daf.getAllDogProfile();
-        if(persistList.size()>0){
-            for(DogsData dd : persistList){
+        if (persistList.size() > 0) {
+            for (DogsData dd : persistList) {
                 mLeDeviceListAdapter.addDevice(dd);
                 mLeDeviceListAdapter.notifyDataSetChanged();
             }
             deviceCount = persistList.size();
         }
-        mLeDeviceListAdapter.addDevice(null);
-        mLeDeviceListAdapter.notifyDataSetChanged();
+//        mLeDeviceListAdapter.addDevice(null);
+//        mLeDeviceListAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -125,7 +136,7 @@ public class DogScanActivity extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_scan:
-                 mLeDeviceListAdapter.clear();
+                mLeDeviceListAdapter.clear();
                 scanLeDevice(true);
                 break;
             case R.id.menu_stop:
@@ -148,7 +159,8 @@ public class DogScanActivity extends ListActivity {
             }
         }
         mLeDeviceListAdapter = new LeDeviceListAdapter();
-        setListAdapter(mLeDeviceListAdapter);
+
+        deviceList.setAdapter(mLeDeviceListAdapter);
       /*  mLeDeviceListAdapter.addDevice(null);
         mLeDeviceListAdapter.notifyDataSetChanged();*/
         getDogListFromDB();
@@ -172,29 +184,29 @@ public class DogScanActivity extends ListActivity {
         mLeDeviceListAdapter.clear();
     }
 
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        if(position == deviceCount){
-            final Intent intent = new Intent(this, DeviceScanActivity.class);
-            if (mScanning) {
-                mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                mScanning = false;
-            }
-            startActivity(intent);
-        }else {
-            final DogsData device = mLeDeviceListAdapter.getDevice(position);
-            if (device == null) return;
-            final Intent intent = new Intent(this, DogProfileControlActivity.class);
-            intent.putExtra(DogProfileControlActivity.EXTRAS_DEVICE_NAME, device.getDeviceName());
-            intent.putExtra(DogProfileControlActivity.EXTRAS_DEVICE_ADDRESS, device.getDeviceAddress());
-            intent.putExtra(DogProfileControlActivity.EXTRAS_DOG_ID, device.getId()+"");
-            if (mScanning) {
-                mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                mScanning = false;
-            }
-            startActivity(intent);
-        }
-    }
+//    @Override
+//    protected void onListItemClick(ListView l, View v, int position, long id) {
+//        if(position == deviceCount){
+//            final Intent intent = new Intent(this, DeviceScanActivity.class);
+//            if (mScanning) {
+//                mBluetoothAdapter.stopLeScan(mLeScanCallback);
+//                mScanning = false;
+//            }
+//            startActivity(intent);
+//        }else {
+//            final DogsData device = mLeDeviceListAdapter.getDevice(position);
+//            if (device == null) return;
+//            final Intent intent = new Intent(this, DogProfileControlActivity.class);
+//            intent.putExtra(DogProfileControlActivity.EXTRAS_DEVICE_NAME, device.getDeviceName());
+//            intent.putExtra(DogProfileControlActivity.EXTRAS_DEVICE_ADDRESS, device.getDeviceAddress());
+//            intent.putExtra(DogProfileControlActivity.EXTRAS_DOG_ID, device.getId()+"");
+//            if (mScanning) {
+//                mBluetoothAdapter.stopLeScan(mLeScanCallback);
+//                mScanning = false;
+//            }
+//            startActivity(intent);
+//        }
+//    }
 
     private void scanLeDevice(final boolean enable) {
         if (enable) {
@@ -229,16 +241,16 @@ public class DogScanActivity extends ListActivity {
         }
 
         public void addDevice(DogsData device) {
-            if(!mLeDevices.contains(device)) {
-                if(device != null)
-                device.setStatus(false);
+            if (!mLeDevices.contains(device)) {
+                if (device != null)
+                    device.setStatus(false);
                 mLeDevices.add(device);
             }
         }
 
         public void invalidateDevice() {
-            for(DogsData dgsData : mLeDevices){
-                if(dgsData != null )
+            for (DogsData dgsData : mLeDevices) {
+                if (dgsData != null)
                     dgsData.setStatus(false);
             }
             notifyDataSetChanged();
@@ -246,11 +258,11 @@ public class DogScanActivity extends ListActivity {
 
         public void updateDevice(BluetoothDevice device) {
             String addrss = device.getAddress();
-            for(DogsData dgsData : mLeDevices){
-                if(dgsData != null )
-                if(dgsData.getDeviceAddress().equals(addrss)){
-                    dgsData.setStatus(true);
-                }
+            for (DogsData dgsData : mLeDevices) {
+                if (dgsData != null)
+                    if (dgsData.getDeviceAddress().equals(addrss)) {
+                        dgsData.setStatus(true);
+                    }
             }
         }
 
@@ -281,39 +293,39 @@ public class DogScanActivity extends ListActivity {
         public View getView(int i, View view, ViewGroup viewGroup) {
             ViewHolder viewHolder;
             // General ListView optimization code.
-            if(i == deviceCount){
-                if (view == null) {
-                    view = mInflator.inflate(R.layout.add_item, null);
-
-                } else {
-                    viewHolder = (ViewHolder) view.getTag();
-                }
-
-                return view;
-            }else {
-                if (view == null) {
-                    view = mInflator.inflate(R.layout.device_item, null);
-                    viewHolder = new ViewHolder();
-                    //viewHolder.deviceAddress = (TextView) view.findViewById(R.id.device_address);
-                    viewHolder.dogName = (TextView) view.findViewById(R.id.dog_name);
+//            if(i == deviceCount){
+//                if (view == null) {
+//                    view = mInflator.inflate(R.layout.add_item, null);
+//
+//                } else {
+//                    viewHolder = (ViewHolder) view.getTag();
+//                }
+//
+//                return view;
+//            }else {
+            if (view == null) {
+                view = mInflator.inflate(R.layout.device_item, null);
+                viewHolder = new ViewHolder();
+                //viewHolder.deviceAddress = (TextView) view.findViewById(R.id.device_address);
+                viewHolder.dogName = (TextView) view.findViewById(R.id.dog_name);
 /*                    viewHolder.dogAge = (TextView) view.findViewById(R.id.dog_age);
                     viewHolder.dogGoal= (TextView) view.findViewById(R.id.dog_goal);
                     viewHolder.dogImage = (ImageView) view.findViewById(R.id.dog_image);*/
-                    viewHolder.bluetooth = (ImageView) view.findViewById(R.id.ble_image);
+                viewHolder.bluetooth = (ImageView) view.findViewById(R.id.ble_image);
 
-                    view.setTag(viewHolder);
-                } else {
-                    viewHolder = (ViewHolder) view.getTag();
-                }
+                view.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) view.getTag();
+            }
 
-                DogsData dogsData = mLeDevices.get(i);
-                final String dogsDataName = dogsData.getName();
+            DogsData dogsData = mLeDevices.get(i);
+            final String dogsDataName = dogsData.getName();
 //                final int dogsDataAge = dogsData.getAge();
 //                final String dogsDataGoal = dogsData.getGoal();
-                if (dogsDataName != null && dogsDataName.length() > 0)
-                    viewHolder.dogName.setText(dogsDataName);
-                else
-                    viewHolder.dogName.setText(R.string.unknown_device);
+            if (dogsDataName != null && dogsDataName.length() > 0)
+                viewHolder.dogName.setText(dogsDataName);
+            else
+                viewHolder.dogName.setText(R.string.unknown_device);
 
                /* if (dogsDataAge != 0)
                     viewHolder.dogAge.setText(dogsDataAge+"");
@@ -333,14 +345,14 @@ public class DogScanActivity extends ListActivity {
                     viewHolder.dogImage.setImageResource(R.drawable.pack_btn);
                 }*/
 
-                if(dogsData.isStatus()){
-                    viewHolder.bluetooth.setImageResource(R.drawable.bluetooth);
-                }else{
-                    viewHolder.bluetooth.setImageResource(R.drawable.discnt);
-                }
-
-                return view;
+            if (dogsData.isStatus()) {
+                viewHolder.bluetooth.setImageResource(R.drawable.bluetooth);
+            } else {
+                viewHolder.bluetooth.setImageResource(R.drawable.discnt);
             }
+
+            return view;
+//            }
         }
     }
 
@@ -348,23 +360,23 @@ public class DogScanActivity extends ListActivity {
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
             new BluetoothAdapter.LeScanCallback() {
 
-        @Override
-        public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
-            runOnUiThread(new Runnable() {
                 @Override
-                public void run() {
-                    mLeDeviceListAdapter.updateDevice(device);
-                    mLeDeviceListAdapter.notifyDataSetChanged();
+                public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mLeDeviceListAdapter.updateDevice(device);
+                            mLeDeviceListAdapter.notifyDataSetChanged();
+                        }
+                    });
                 }
-            });
-        }
-    };
+            };
 
     static class ViewHolder {
         TextView dogName;
-/*        TextView dogAge;
-        TextView dogGoal;
-        ImageView dogImage;*/
+        /*        TextView dogAge;
+                TextView dogGoal;
+                ImageView dogImage;*/
         ImageView bluetooth;
     }
 }
