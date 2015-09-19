@@ -10,6 +10,7 @@ import android.widget.ListView;
 import com.ampt.bluetooth.Adapters.DogsAdapter;
 import com.ampt.bluetooth.R;
 import com.ampt.bluetooth.activities.AddDogActivity;
+import com.ampt.bluetooth.activities.DogScanActivity;
 import com.ampt.bluetooth.database.helper.DatabaseHelper;
 import com.ampt.bluetooth.database.model.DogsData;
 import com.melnykov.fab.FloatingActionButton;
@@ -36,7 +37,7 @@ public class Tab_Dogs_activity extends Activity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(Tab_Dogs_activity.this, AddDogActivity.class), 123);
+                startActivityForResult(new Intent(Tab_Dogs_activity.this, DogScanActivity.class), 123);
             }
         });
     }

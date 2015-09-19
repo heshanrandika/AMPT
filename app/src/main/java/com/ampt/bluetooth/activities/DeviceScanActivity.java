@@ -152,16 +152,16 @@ public class DeviceScanActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         final BluetoothDevice device = mLeDeviceListAdapter.getDevice(position);
-//        if (device == null) return;
-//        final Intent intent = new Intent(this, AddOrEditDogProfile.class);
-//        intent.putExtra(AddOrEditDogProfile.EXTRAS_DEVICE_NAME, device.getName());
-//        intent.putExtra(AddOrEditDogProfile.EXTRAS_DEVICE_ADDRESS, device.getAddress());
-//        intent.putExtra(AddOrEditDogProfile.EXTRAS_EDIT_OR_SAVE, AddOrEditDogProfile.EXTRAS_SAVE);
-//        if (mScanning) {
-//            mBluetoothAdapter.stopLeScan(mLeScanCallback);
-//            mScanning = false;
-//        }
-//        startActivity(intent);
+        if (device == null) return;
+       /* final Intent intent = new Intent(this, AddOrEditDogProfile.class);
+        intent.putExtra(AddOrEditDogProfile.EXTRAS_DEVICE_NAME, device.getName());
+        intent.putExtra(AddOrEditDogProfile.EXTRAS_DEVICE_ADDRESS, device.getAddress());
+        intent.putExtra(AddOrEditDogProfile.EXTRAS_EDIT_OR_SAVE, AddOrEditDogProfile.EXTRAS_SAVE);
+        if (mScanning) {
+            mBluetoothAdapter.stopLeScan(mLeScanCallback);
+            mScanning = false;
+        }
+        startActivity(intent);*/
     }
     private  void deviceAddressList(){
         deviceList = daf.getAllDeviceAddress();
@@ -250,11 +250,6 @@ public class DeviceScanActivity extends ListActivity {
             }
 
             BluetoothDevice device = mLeDevices.get(i);
-            final String deviceName = device.getName();
-            if (deviceName != null && deviceName.length() > 0)
-                viewHolder.deviceName.setText(deviceName);
-            else
-                viewHolder.deviceName.setText(R.string.unknown_device);
             viewHolder.deviceAddress.setText(device.getAddress());
 
             return view;
@@ -278,7 +273,6 @@ public class DeviceScanActivity extends ListActivity {
     };
 
     static class ViewHolder {
-        TextView deviceName;
         TextView deviceAddress;
     }
 }
