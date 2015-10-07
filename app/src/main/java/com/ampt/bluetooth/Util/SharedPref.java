@@ -20,4 +20,18 @@ public class SharedPref {
         editor.putLong("com.ampt.defaultDogId", value);
         editor.commit();
     }
+
+
+    public static long getCurrentDogId(Context context) {
+        SharedPreferences sharedPref = context.getSharedPreferences("com.AMPT", Context.MODE_PRIVATE);
+        long currentDogId = sharedPref.getLong("com.ampt.currentDogId", 1);
+        return currentDogId;
+    }
+
+    public static void setCurrentDogId(Context context, long value) {
+        SharedPreferences sharedPref = context.getSharedPreferences("com.AMPT", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putLong("com.ampt.currentDogId", value);
+        editor.commit();
+    }
 }
