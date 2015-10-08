@@ -37,7 +37,7 @@ import java.util.UUID;
 public class Tab_Home_activity extends Activity {
     public static final String COLLAR_CLICK = "5";
     DatabaseHelper daf = new DatabaseHelper(this);
-    private long dog_id;
+    private long dog_id = SharedPref.getCurrentDogId(this);
     private final static String TAG = DeviceControlActivity.class.getSimpleName();
     private String mDeviceName;
     private String mDeviceAddress;
@@ -63,20 +63,30 @@ public class Tab_Home_activity extends Activity {
         iv = (ImageView) findViewById(R.id.profile_image);
         checkAtLeastOneDogAvailable(this);
 
-
+        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
+        bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
     }
 
 
     private void checkAtLeastOneDogAvailable(Context context) {
-        List<DogsData> dogsDataList = daf.getAllDogProfile();
-        if (null != dogsDataList && dogsDataList.size() > 0) {
-            long defaultId = SharedPref.getDefaultDogId(context);
-            DogsData dogsData = daf.getDogProfile(defaultId);
+        if(dog_id != 0){
+            DogsData dogsData = daf.getDogProfile(dog_id);
             System.out.println("ccccccccccccccccccc    "+Long.parseLong(dogsData.getImageID()));
+            mDeviceAddress = dogsData.getDeviceAddress();
             ImageSetter.setImage(this, iv, Long.parseLong(dogsData.getImageID()));
-        } else {
-            startActivity(new Intent(context, DeviceScanActivity.class));
+        }else{
+            List<DogsData> dogsDataList = daf.getAllDogProfile();
+            if (null != dogsDataList && dogsDataList.size() > 0) {
+                long defaultId = SharedPref.getDefaultDogId(context);
+                DogsData dogsData = daf.getDogProfile(defaultId);
+                System.out.println("ccccccccccccccccccc    "+Long.parseLong(dogsData.getImageID()));
+                mDeviceAddress = dogsData.getDeviceAddress();
+                ImageSetter.setImage(this, iv, Long.parseLong(dogsData.getImageID()));
+            } else {
+                startActivity(new Intent(context, DeviceScanActivity.class));
+            }
         }
+
     }
 
 
