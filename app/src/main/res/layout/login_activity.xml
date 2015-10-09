@@ -23,7 +23,8 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="25dp"
             android:background="@drawable/facebook_login_button"
-            android:text="LOGIN WITH FACEBOOK" />
+            android:text="LOGIN WITH FACEBOOK"
+            android:textColor="#ffffff" />
 
         <Button
             android:id="@+id/signinButton"
@@ -32,7 +33,8 @@
             android:layout_above="@+id/linearLayout"
             android:layout_centerHorizontal="true"
             android:background="@drawable/sign_up_button"
-            android:text="SIGN IN" />
+            android:text="SIGN IN"
+            android:textColor="#ffffff" />
 
     </LinearLayout>
 
@@ -76,7 +78,7 @@
                 android:layout_marginLeft="10dp"
                 android:text="Sign up"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#F9D716" />
+                android:textColor="#fa861e" />
 
 
         </LinearLayout>
@@ -87,7 +89,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:gravity="center"
-            android:text="Don't know what AMPT ANIMAL is?"
+            android:text="Don&apos;t know what Ampt Animal is?"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
 

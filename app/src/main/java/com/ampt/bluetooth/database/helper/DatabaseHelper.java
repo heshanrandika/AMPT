@@ -293,10 +293,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             dogProfile.setGoalWalk((c.getInt(c.getColumnIndex(GOAL_WALK))));
             dogProfile.setGoalPlay((c.getInt(c.getColumnIndex(GOAL_PLAY))));
             dogProfile.setAge((c.getInt(c.getColumnIndex(KEY_AGE))));
-            dogProfile.setBreed((c.getString(c.getColumnIndex(KEY_BREED))));
-            dogProfile.setDob((c.getString(c.getColumnIndex(KEY_DOB))));
-            dogProfile.setGender((c.getString(c.getColumnIndex(KEY_GENDER))));
-            dogProfile.setImageID((c.getString(c.getColumnIndex(KEY_IMAGEID))));
 
             db.close();
             return dogProfile;

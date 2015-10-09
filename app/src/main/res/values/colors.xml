@@ -8,4 +8,7 @@
     <color name="white">#FFFFFF</color>
     <color name="BleedingRed">#c00a00</color>
     <color name="toastGreen">#2ecc71</color>
+    <color name="addBtn">#5274a1</color>
+    <color name="addBtnPress">#648dc4</color>
+    <color name="btnThemeClr">#fa861e</color>
 </resources>

@@ -72,8 +72,8 @@
         android:layout_gravity="bottom|right"
         android:layout_margin="16dp"
         android:src="@drawable/ic_add_black_48dp"
-        fab:fab_colorNormal="@color/primary"
-        fab:fab_colorPressed="@color/primary"
+        fab:fab_colorNormal="@color/addBtn"
+        fab:fab_colorPressed="@color/addBtnPress"
         fab:fab_shadow="true"
         fab:fab_type="normal" />
 

@@ -1,5 +1,7 @@
 package com.ampt.bluetooth.activities.tabs;
 
+
+
 import android.app.Activity;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
@@ -9,36 +11,61 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.ampt.bluetooth.R;
 import com.ampt.bluetooth.SampleGattAttributes;
 import com.ampt.bluetooth.Util.ImageSetter;
 import com.ampt.bluetooth.Util.SharedPref;
-//import com.ampt.bluetooth.activities.AddDogActivity;
 import com.ampt.bluetooth.activities.BluetoothLeService;
-import com.ampt.bluetooth.activities.DeviceControlActivity;
 import com.ampt.bluetooth.activities.DeviceScanActivity;
+import com.ampt.bluetooth.chartView;
 import com.ampt.bluetooth.database.helper.DatabaseHelper;
 import com.ampt.bluetooth.database.model.ActivityData;
 import com.ampt.bluetooth.database.model.DogsData;
+import com.ampt.bluetooth.singleChartView;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 /**
- * Created by malith on 7/31/15.
+ * Created by Heshanr on 4/18/2015.
  */
 public class Tab_Home_activity extends Activity {
-    public static final String COLLAR_CLICK = "5";
+    private final static String TAG = Tab_Home_activity.class.getSimpleName();
     DatabaseHelper daf = new DatabaseHelper(this);
-    private long dog_id = SharedPref.getCurrentDogId(this);
-    private final static String TAG = DeviceControlActivity.class.getSimpleName();
+    public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
+    public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
+    public static final String EXTRAS_DOG_ID = "DOG_ID";
+    public static final String COLLAR_CLICK = "5";
+    public static final String SYNC_PRESS = "2";
+
+    private TextView dogName;
+  /*  private TextView dogAge;
+    private TextView sleepTime;
+    private TextView walkTime;
+    private TextView playTime;
+    private TextView swimTime;*/
+
+    private ImageView iv;
+
+
+    private String img;
+    private long dog_id;
+    private TextView engageTxt;
     private String mDeviceName;
     private String mDeviceAddress;
     //  private ExpandableListView mGattServicesList;
@@ -53,43 +80,8 @@ public class Tab_Home_activity extends Activity {
 
     private final String LIST_NAME = "NAME";
     private final String LIST_UUID = "UUID";
-    private ImageView iv;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.tab_home_layout);
-
-        iv = (ImageView) findViewById(R.id.profile_image);
-        checkAtLeastOneDogAvailable(this);
-
-        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
-        bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
-    }
-
-
-    private void checkAtLeastOneDogAvailable(Context context) {
-        if(dog_id != 0){
-            DogsData dogsData = daf.getDogProfile(dog_id);
-            System.out.println("ccccccccccccccccccc    "+Long.parseLong(dogsData.getImageID()));
-            mDeviceAddress = dogsData.getDeviceAddress();
-            ImageSetter.setImage(this, iv, Long.parseLong(dogsData.getImageID()));
-        }else{
-            List<DogsData> dogsDataList = daf.getAllDogProfile();
-            if (null != dogsDataList && dogsDataList.size() > 0) {
-                long defaultId = SharedPref.getDefaultDogId(context);
-                DogsData dogsData = daf.getDogProfile(defaultId);
-                System.out.println("ccccccccccccccccccc    "+Long.parseLong(dogsData.getImageID()));
-                mDeviceAddress = dogsData.getDeviceAddress();
-                ImageSetter.setImage(this, iv, Long.parseLong(dogsData.getImageID()));
-            } else {
-                startActivity(new Intent(context, DeviceScanActivity.class));
-            }
-        }
-
-    }
-
-
+    // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
@@ -110,6 +102,12 @@ public class Tab_Home_activity extends Activity {
         }
     };
 
+    // Handles various events fired by the Service.
+    // ACTION_GATT_CONNECTED: connected to a GATT server.
+    // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
+    // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
+    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read
+    //                        or notification operations.
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -122,14 +120,128 @@ public class Tab_Home_activity extends Activity {
                 mConnected = false;
                 updateConnectionState(R.string.disconnected);
                 invalidateOptionsMenu();
+                clearUI();
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
                 displayGattServices(mBluetoothLeService.getSupportedGattServices());
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                //saveData(intent.getStringExtra(mBluetoothLeService.EXTRA_DATA));
+                saveData(intent.getStringExtra(mBluetoothLeService.EXTRA_DATA));
             }
         }
     };
+
+    private void clearUI() {
+        //mDataField.setText(R.string.no_data);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.tab_home_layout);
+
+        final Intent intent = getIntent();
+        mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
+        mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
+
+        iv = (ImageView) findViewById(R.id.profile_image);
+        engageTxt = (TextView) findViewById(R.id.engage_txt);
+
+
+
+        checkAtLeastOneDogAvailable(this);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
+        bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+
+
+        engageTxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                makeChange(COLLAR_CLICK);
+            }
+        });
+
+
+    }
+
+
+    private void checkAtLeastOneDogAvailable(Context context) {
+        dog_id = SharedPref.getCurrentDogId(context);
+        if(dog_id != 0){
+            DogsData dogsData = daf.getDogProfile(dog_id);
+            System.out.println("ccccccccccccccccccc    "+Long.parseLong(dogsData.getImageID()));
+            mDeviceAddress = dogsData.getDeviceAddress();
+            mDeviceName = dogsData.getDeviceName();
+            ImageSetter.setImage(this, iv, Long.parseLong(dogsData.getImageID()));
+        }else{
+            List<DogsData> dogsDataList = daf.getAllDogProfile();
+            if (null != dogsDataList && dogsDataList.size() > 0) {
+                long defaultId = SharedPref.getDefaultDogId(context);
+                DogsData dogsData = daf.getDogProfile(defaultId);
+                System.out.println("ccccccccccccccccccc    "+Long.parseLong(dogsData.getImageID()));
+                mDeviceAddress = dogsData.getDeviceAddress();
+                mDeviceName = dogsData.getDeviceName();
+                ImageSetter.setImage(this, iv, Long.parseLong(dogsData.getImageID()));
+            } else {
+                startActivity(new Intent(context, DeviceScanActivity.class));
+            }
+        }
+
+    }
+
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        if (mBluetoothLeService != null) {
+            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+            Log.d(TAG, "Connect request result=" + result);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mGattUpdateReceiver);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(mServiceConnection);
+        mBluetoothLeService = null;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.gatt_services, menu);
+        if (mConnected) {
+            menu.findItem(R.id.menu_connect).setVisible(false);
+            menu.findItem(R.id.menu_disconnect).setVisible(true);
+        } else {
+            menu.findItem(R.id.menu_connect).setVisible(true);
+            menu.findItem(R.id.menu_disconnect).setVisible(false);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.menu_connect:
+                mBluetoothLeService.connect(mDeviceAddress);
+                return true;
+            case R.id.menu_disconnect:
+                mBluetoothLeService.disconnect();
+                return true;
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private void updateConnectionState(final int resourceId) {
         runOnUiThread(new Runnable() {
@@ -138,41 +250,6 @@ public class Tab_Home_activity extends Activity {
                 //mConnectionState.setText(resourceId);
             }
         });
-    }
-
-    private void displayGattServices(List<BluetoothGattService> gattServices) {
-        if (gattServices == null) return;
-        String uuid = null;
-        String unknownServiceString = getResources().getString(R.string.unknown_service);
-        ArrayList<HashMap<String, String>> gattServiceData = new ArrayList<HashMap<String, String>>();
-
-
-        // Loops through available GATT Services.
-        for (BluetoothGattService gattService : gattServices) {
-            HashMap<String, String> currentServiceData = new HashMap<String, String>();
-            uuid = gattService.getUuid().toString();
-            currentServiceData.put(
-                    LIST_NAME, SampleGattAttributes.lookup(uuid, unknownServiceString));
-
-            // If the service exists for HM 10 Serial, say so.
-            if(SampleGattAttributes.lookup(uuid, unknownServiceString) == "HM 10 Serial") {}
-            currentServiceData.put(LIST_UUID, uuid);
-            gattServiceData.add(currentServiceData);
-
-            // get characteristic when UUID matches RX/TX UUID
-            characteristicTX = gattService.getCharacteristic(BluetoothLeService.UUID_HM_RX_TX);
-            characteristicRX = gattService.getCharacteristic(BluetoothLeService.UUID_HM_RX_TX);
-        }
-
-    }
-
-    private static IntentFilter makeGattUpdateIntentFilter() {
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
-        intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
-        return intentFilter;
     }
 
     private void saveData(String data) {
@@ -212,6 +289,46 @@ public class Tab_Home_activity extends Activity {
         swimTime.setText(swmH+"h "+swmM+"min");*/
     }
 
+    // Demonstrates how to iterate through the supported GATT Services/Characteristics.
+    // In this sample, we populate the data structure that is bound to the ExpandableListView
+    // on the UI.
+    private void displayGattServices(List<BluetoothGattService> gattServices) {
+        if (gattServices == null) return;
+        String uuid = null;
+        String unknownServiceString = getResources().getString(R.string.unknown_service);
+        ArrayList<HashMap<String, String>> gattServiceData = new ArrayList<HashMap<String, String>>();
+
+
+        // Loops through available GATT Services.
+        for (BluetoothGattService gattService : gattServices) {
+            HashMap<String, String> currentServiceData = new HashMap<String, String>();
+            uuid = gattService.getUuid().toString();
+            currentServiceData.put(
+                    LIST_NAME, SampleGattAttributes.lookup(uuid, unknownServiceString));
+
+            // If the service exists for HM 10 Serial, say so.
+            if(SampleGattAttributes.lookup(uuid, unknownServiceString) == "HM 10 Serial") {}
+            currentServiceData.put(LIST_UUID, uuid);
+            gattServiceData.add(currentServiceData);
+
+            // get characteristic when UUID matches RX/TX UUID
+            characteristicTX = gattService.getCharacteristic(BluetoothLeService.UUID_HM_RX_TX);
+            characteristicRX = gattService.getCharacteristic(BluetoothLeService.UUID_HM_RX_TX);
+        }
+
+    }
+
+    private static IntentFilter makeGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
+        intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
+        return intentFilter;
+    }
+
+
+    // on change of bars write char
     private void makeChange(String value) {
         String str = value+"";
         Log.d(TAG, "Sending result=" + str);
@@ -219,31 +336,8 @@ public class Tab_Home_activity extends Activity {
         if(mConnected) {
             characteristicTX.setValue(tx);
             mBluetoothLeService.writeCharacteristic(characteristicTX);
-            mBluetoothLeService.setCharacteristicNotification(characteristicRX, true);
+            mBluetoothLeService.setCharacteristicNotification(characteristicRX,true);
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        checkAtLeastOneDogAvailable(this);
-        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-        if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
-            Log.d(TAG, "Connect request result=" + result);
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(mGattUpdateReceiver);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unbindService(mServiceConnection);
-        mBluetoothLeService = null;
-    }
 }

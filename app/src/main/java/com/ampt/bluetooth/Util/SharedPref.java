@@ -24,7 +24,7 @@ public class SharedPref {
 
     public static long getCurrentDogId(Context context) {
         SharedPreferences sharedPref = context.getSharedPreferences("com.AMPT", Context.MODE_PRIVATE);
-        long currentDogId = sharedPref.getLong("com.ampt.currentDogId", 1);
+        long currentDogId = sharedPref.getLong("com.ampt.currentDogId", 0);
         return currentDogId;
     }
 

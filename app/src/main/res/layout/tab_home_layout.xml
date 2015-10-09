@@ -20,7 +20,7 @@
 
 
     <TextView
-        android:id="@+id/num_txt"
+        android:id="@+id/engage_txt"
         android:layout_width="135dp"
         android:layout_height="135dp"
 

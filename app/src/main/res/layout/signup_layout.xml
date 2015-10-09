@@ -94,7 +94,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="15dp"
-                    android:background="@color/accent_material_light"
+                    android:background="@color/btnThemeClr"
                     android:text="Create" />
             </LinearLayout>
         </LinearLayout>
