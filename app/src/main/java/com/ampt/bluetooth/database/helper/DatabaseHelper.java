@@ -48,6 +48,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_DEVICE_NAME = "device_name";
     private static final String KEY_DEVICE_ADDRESS = "device_address";
     private static final String KEY_GOAL = "goal";
+    private static final String GOAL_WALK = "goal_walk";
+    private static final String GOAL_PLAY = "goal_play";
     private static final String KEY_BREED = "breed";
     private static final String KEY_GENDER = "gender";
     private static final String KEY_DOB = "dob";
@@ -91,6 +93,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + KEY_NAME + " TEXT NOT NULL,"
             + KEY_GOAL + " TEXT,"
+            + GOAL_WALK + " INTEGER,"
+            + GOAL_PLAY + " INTEGER,"
             + KEY_AGE + " INTEGER,"
             + KEY_IMAGEID + " TEXT NOT NULL,"
             + KEY_BREED + " TEXT NOT NULL,"
@@ -210,6 +214,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, data.getName());
         values.put(KEY_GOAL, data.getGoal());
+        values.put(GOAL_WALK, data.getGoalWalk());
+        values.put(GOAL_PLAY, data.getGoalPlay());
         values.put(KEY_AGE, data.getAge());
         values.put(KEY_IMAGEID, data.getImageID());
         values.put(KEY_DEVICE_NAME, data.getDeviceName());
@@ -245,6 +251,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             dogProfile.setId(c.getInt(c.getColumnIndex(KEY_ID)));
             dogProfile.setName((c.getString(c.getColumnIndex(KEY_NAME))));
             dogProfile.setGoal((c.getString(c.getColumnIndex(KEY_GOAL))));
+            dogProfile.setGoalWalk((c.getInt(c.getColumnIndex(GOAL_WALK))));
+            dogProfile.setGoalPlay((c.getInt(c.getColumnIndex(GOAL_PLAY))));
             dogProfile.setAge((c.getInt(c.getColumnIndex(KEY_AGE))));
             dogProfile.setImageID((c.getString(c.getColumnIndex(KEY_IMAGEID))));
             dogProfile.setDeviceName((c.getString(c.getColumnIndex(KEY_DEVICE_NAME))));
@@ -269,7 +277,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public DogsData getDogBasic(long dog_id) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String selectQuery = "SELECT  " + KEY_NAME + "," + KEY_AGE + "," + KEY_GOAL + "," + KEY_ID + " FROM " + TABLE_DOGS_DATA + " WHERE "
+        String selectQuery = "SELECT  " + KEY_NAME + "," + KEY_AGE + "," + KEY_GOAL + "," + GOAL_WALK + "," + GOAL_PLAY + "," + KEY_ID + " FROM " + TABLE_DOGS_DATA + " WHERE "
                 + KEY_ID + " = " + dog_id;
 
         Log.e(LOG, selectQuery);
@@ -282,6 +290,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             dogProfile.setId(c.getInt(c.getColumnIndex(KEY_ID)));
             dogProfile.setName((c.getString(c.getColumnIndex(KEY_NAME))));
             dogProfile.setGoal((c.getString(c.getColumnIndex(KEY_GOAL))));
+            dogProfile.setGoalWalk((c.getInt(c.getColumnIndex(GOAL_WALK))));
+            dogProfile.setGoalPlay((c.getInt(c.getColumnIndex(GOAL_PLAY))));
             dogProfile.setAge((c.getInt(c.getColumnIndex(KEY_AGE))));
             dogProfile.setBreed((c.getString(c.getColumnIndex(KEY_BREED))));
             dogProfile.setDob((c.getString(c.getColumnIndex(KEY_DOB))));
@@ -314,6 +324,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             dogProfile.setId(c.getInt(c.getColumnIndex(KEY_ID)));
             dogProfile.setName((c.getString(c.getColumnIndex(KEY_NAME))));
             dogProfile.setGoal((c.getString(c.getColumnIndex(KEY_GOAL))));
+            dogProfile.setGoalWalk((c.getInt(c.getColumnIndex(GOAL_WALK))));
+            dogProfile.setGoalPlay((c.getInt(c.getColumnIndex(GOAL_PLAY))));
             dogProfile.setAge((c.getInt(c.getColumnIndex(KEY_AGE))));
             dogProfile.setImageID((c.getString(c.getColumnIndex(KEY_IMAGEID))));
             dogProfile.setDeviceName((c.getString(c.getColumnIndex(KEY_DEVICE_NAME))));
@@ -354,6 +366,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 dogProfile.setId(c.getLong(c.getColumnIndex(KEY_ID)));
                 dogProfile.setName((c.getString(c.getColumnIndex(KEY_NAME))));
                 dogProfile.setGoal((c.getString(c.getColumnIndex(KEY_GOAL))));
+                dogProfile.setGoalWalk((c.getInt(c.getColumnIndex(GOAL_WALK))));
+                dogProfile.setGoalPlay((c.getInt(c.getColumnIndex(GOAL_PLAY))));
                 dogProfile.setAge((c.getInt(c.getColumnIndex(KEY_AGE))));
                 dogProfile.setImageID((c.getString(c.getColumnIndex(KEY_IMAGEID))));
                 dogProfile.setDeviceName((c.getString(c.getColumnIndex(KEY_DEVICE_NAME))));
@@ -418,6 +432,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, data.getName());
         values.put(KEY_GOAL, data.getGoal());
+        values.put(GOAL_WALK, data.getGoalWalk());
+        values.put(GOAL_PLAY, data.getGoalPlay());
         values.put(KEY_AGE, data.getAge());
         values.put(KEY_IMAGE, data.getImageID());
         values.put(KEY_STATUS, 0);
@@ -431,6 +447,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return updated;
     }
+
+
+    /**
+     * Set Goal
+     */
+    public int setGoal(DogsData data) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(GOAL_WALK, data.getGoalWalk());
+        values.put(GOAL_PLAY, data.getGoalPlay());
+
+
+        int updated = db.update(TABLE_DOGS_DATA, values, KEY_ID + " = ?", new String[]{String.valueOf(data.getId())});
+        db.close();
+        return updated;
+    }
+
 
     /**
      * Deleting a DogProfile

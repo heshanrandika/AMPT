@@ -1,4 +1,4 @@
-package com.ampt.bluetooth.Util;
+/*package com.ampt.bluetooth.Util;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
@@ -33,9 +33,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-/**
+*//**
  * Created by Heshan on 10/8/2015.
- */
+ *//*
 public class BluetoothCaller {
     public String mDeviceAddress ="";
     private final static String TAG = DeviceControlActivity.class.getSimpleName();
@@ -191,10 +191,10 @@ public class BluetoothCaller {
         int plyH = ply/60; int plyM = ply%60;
         int swmH = swm/60; int swmM = swm%60;
 
-       /* sleepTime.setText(slpH+"h "+slpM+"min");
+       *//* sleepTime.setText(slpH+"h "+slpM+"min");
         walkTime.setText(wlkH+"h "+wlkM+"min");
         playTime.setText(plyH+"h "+plyM+"min");
-        swimTime.setText(swmH+"h "+swmM+"min");*/
+        swimTime.setText(swmH+"h "+swmM+"min");*//*
     }
 
     // Demonstrates how to iterate through the supported GATT Services/Characteristics.
@@ -230,4 +230,4 @@ public class BluetoothCaller {
 
 
 
-}
+}*/

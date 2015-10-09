@@ -13,6 +13,8 @@ public class DogsData {
     private int age;
     private String created_at;
     private String goal;
+    private int goalWalk;
+    private int goalPlay;
     private String gender;
     private String dob;
     private String breed;
@@ -120,5 +122,21 @@ public class DogsData {
 
     public void setBreed(String breed) {
         this.breed = breed;
+    }
+
+    public void setGoalWalk(int goalWalk) {
+        this.goalWalk = goalWalk;
+    }
+
+    public int getGoalWalk() {
+        return goalWalk;
+    }
+
+    public int getGoalPlay() {
+        return goalPlay;
+    }
+
+    public void setGoalPlay(int goalPlay) {
+        this.goalPlay = goalPlay;
     }
 }
