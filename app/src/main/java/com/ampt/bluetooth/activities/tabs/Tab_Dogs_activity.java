@@ -29,6 +29,8 @@ public class Tab_Dogs_activity extends Activity {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab_dogs_layout);
+        // DatabaseHelper db = new DatabaseHelper(this);
+        // db.addDog(new DogsData("aaaa","1",true,"11111111","222222",2,"sdf","sdfdsf"));
 
         setAdapter();
 
@@ -42,12 +44,13 @@ public class Tab_Dogs_activity extends Activity {
         });
     }
 
-    private void setAdapter() {
+    public void setAdapter() {
         lv = (ListView) findViewById(R.id.listViewdogs);
         List<DogsData> dogsList = new DatabaseHelper(Tab_Dogs_activity.this).getAllDogProfile();
         Log.i("TAB DOGS", " dogs count : " + dogsList.size());
         dogsAdapter = new DogsAdapter(Tab_Dogs_activity.this, R.layout.dogs_row, dogsList);
         lv.setAdapter(dogsAdapter);
+        dogsAdapter.setNotifyOnChange(true);
     }
 
     @Override

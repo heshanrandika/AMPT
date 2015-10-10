@@ -11,4 +11,7 @@
     <color name="addBtn">#5274a1</color>
     <color name="addBtnPress">#648dc4</color>
     <color name="btnThemeClr">#fa861e</color>
+    <color name="green">#2cc36b</color>
+    <color name="red">#c0392b</color>
+    <color name="redlight">#e74c3c</color>
 </resources>

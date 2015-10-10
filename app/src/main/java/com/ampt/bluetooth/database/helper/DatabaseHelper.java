@@ -431,7 +431,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(GOAL_WALK, data.getGoalWalk());
         values.put(GOAL_PLAY, data.getGoalPlay());
         values.put(KEY_AGE, data.getAge());
-        values.put(KEY_IMAGE, data.getImageID());
+        values.put(KEY_IMAGEID, data.getImageID());
         values.put(KEY_STATUS, 0);
         values.put(KEY_BREED, data.getBreed());
         values.put(KEY_DOB, data.getDob());

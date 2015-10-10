@@ -1,6 +1,7 @@
 package com.ampt.bluetooth.Adapters;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,8 @@ import android.widget.TextView;
 
 import com.ampt.bluetooth.AsyncTask.LoadImage;
 import com.ampt.bluetooth.R;
+import com.ampt.bluetooth.activities.dialogs.EditDogDialog;
+import com.ampt.bluetooth.database.helper.DatabaseHelper;
 import com.ampt.bluetooth.database.model.DogsData;
 
 import java.util.List;
@@ -34,12 +37,23 @@ public class DogsAdapter extends ArrayAdapter<DogsData> {
     }
 
     @Override
+    public void setNotifyOnChange(boolean notifyOnChange) {
+        super.setNotifyOnChange(notifyOnChange);
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+    }
+
+
+    @Override
     public DogsData getItem(int position) {
         return dogs.get(position);
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
+        final ViewHolder viewHolder;
         if (convertView == null) {
             convertView = LayoutInflater.from(this.getContext())
                     .inflate(layout, parent, false);
@@ -54,7 +68,7 @@ public class DogsAdapter extends ArrayAdapter<DogsData> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        DogsData item = getItem(position);
+        final DogsData item = getItem(position);
         if (item != null) {
             viewHolder.dogName.setText(item.getName());
             long imageID = Long.parseLong(item.getImageID());
@@ -66,6 +80,24 @@ public class DogsAdapter extends ArrayAdapter<DogsData> {
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
+
+            viewHolder.info.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EditDogDialog dialog = new EditDogDialog(context, item);
+
+                    dialog.show();
+                    dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            dogs.clear();
+                            dogs.addAll(new DatabaseHelper(context).getAllDogProfile());
+                            notifyDataSetChanged();
+                        }
+                    });
+
+                }
+            });
 
         }
 
