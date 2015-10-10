@@ -6,6 +6,13 @@
     android:padding="3dp"
     android:weightSum="1">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="CURRENTLY ADDED DEVICES"
+        android:id="@+id/textView" />
+
     <ListView
         android:id="@+id/dog_scan_activity_list"
         android:layout_width="match_parent"
@@ -17,6 +24,6 @@
         android:id="@+id/dog_scan_activity_add_new_device"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/accent_material_light"
+        android:background="@color/btnThemeClr"
         android:text="Add New Device" />
 </LinearLayout>

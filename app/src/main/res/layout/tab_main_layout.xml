@@ -21,6 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:id="@android:id/tabs"></TabWidget>
+            android:id="@android:id/tabs"
+            android:background="@color/btnThemeClr"></TabWidget>
     </LinearLayout>
 </TabHost>

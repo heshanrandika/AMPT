@@ -50,11 +50,14 @@ import java.text.Format;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Heshanr on 5/7/2015.
@@ -187,10 +190,59 @@ public class Tab_activities_activity extends Activity {
             SpannableString content = new SpannableString("ARCHIVE");
             content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
             archive.setText(content);
-            activityData = daf.getAllActivityDateRange(0);
+            activityData = daf.getAllActivityDateRange(90);
             barPlot.setVisibility(View.INVISIBLE);
             plot.setVisibility(View.VISIBLE);
             drawPlot(new Number[]{}, new Number[]{}, new Number[]{}, new Number[]{}, new String[]{});
+            HashMap<String, Double[]> map = new HashMap<String, Double[]>();
+            String date = "";
+
+
+            drawPlot(new Number[]{}, new Number[]{}, new Number[]{}, new Number[]{}, new String[]{});
+            for(ActivityData activityD  : activityData){
+                Double [] tempNum = new Double[4];
+                tempNum[0] = Double.valueOf(activityD.getPlay());
+                tempNum[1] = Double.valueOf(activityD.getSwimming());
+                tempNum[2] = Double.valueOf(activityD.getSleep());
+                tempNum[3] = Double.valueOf(activityD.getWalk());
+                date = getDate(activityD.getCreatedAt());
+                if(map.containsKey(date)){
+                    map.get(date)[0] += tempNum[0];
+                    map.get(date)[1] += tempNum[1];
+                    map.get(date)[2] += tempNum[2];
+                    map.get(date)[3] += tempNum[3];
+                }else{
+                    map.put(date,tempNum);
+                }
+            }
+
+            Number[] slpArray = new Number[map.size()+2];
+            Number[] wlkArray = new Number[map.size()+2];
+            Number[] swimArray = new Number[map.size()+2];
+            Number[] plyArray = new Number[map.size()+2];
+            String[] xLabels = new String[map.size()+2];
+            slpArray[0] = wlkArray[0] = swimArray[0] = plyArray[0] = 0;
+            slpArray[slpArray.length-1] = wlkArray[wlkArray.length-1] = swimArray[swimArray.length-1] = plyArray[plyArray.length-1] = 0;
+            xLabels[0] = ".";
+            xLabels[xLabels.length-1] = ".";
+            int k = 1;
+            for(String tmpTbl : map.keySet()){
+                plyArray[k]  = Math.round((map.get(tmpTbl)[0]/60)  * 10.0 ) / 10.0;
+                swimArray[k] = Math.round((map.get(tmpTbl)[1]/60)  * 10.0 ) / 10.0;
+                slpArray[k]  = Math.round((map.get(tmpTbl)[2]/60)  * 10.0 ) / 10.0;
+                wlkArray[k]  = Math.round((map.get(tmpTbl)[3]/60)  * 10.0 ) / 10.0;
+                if(k == 1 || k%5 == 0)
+                    xLabels[k]   = tmpTbl;
+                else
+                    xLabels[k]   = ".";
+                k++;
+            }
+            plot.clear();
+            drawPlot(slpArray, wlkArray, swimArray, plyArray, xLabels);
+            plot.redraw();
+
+
+
         }else{
             SpannableString content = new SpannableString("DAILY");
             content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
@@ -198,52 +250,17 @@ public class Tab_activities_activity extends Activity {
             activityData = daf.getAllActivityDateRange(0);
             barPlot.setVisibility(View.VISIBLE);
             plot.setVisibility(View.INVISIBLE);
+
+
+
+
+
+
+
             drawBarPlot();
         }
 
-       /* HashMap<Integer, Double[]> map = new HashMap<Integer, Double[]>();
-        int dogID = 0;
 
-
-        drawPlot(new Number[]{}, new Number[]{}, new Number[]{}, new Number[]{}, new String[]{});
-        for(ActivityData activityD  : activityData){
-            Double [] tempNum = new Double[4];
-            tempNum[0] = Double.valueOf(activityD.getPlay());
-            tempNum[1] = Double.valueOf(activityD.getSwimming());
-            tempNum[2] = Double.valueOf(activityD.getSleep());
-            tempNum[3] = Double.valueOf(activityD.getWalk());
-            dogID = activityD.getDogId();
-            if(map.containsKey(dogID)){
-                map.get(dogID)[0] += tempNum[0];
-                map.get(dogID)[1] += tempNum[1];
-                map.get(dogID)[2] += tempNum[2];
-                map.get(dogID)[3] += tempNum[3];
-            }else{
-                map.put(dogID,tempNum);
-            }
-        }
-
-        Number[] slpArray = new Number[map.size()+2];
-        Number[] wlkArray = new Number[map.size()+2];
-        Number[] swimArray = new Number[map.size()+2];
-        Number[] plyArray = new Number[map.size()+2];
-        String[] xLabels = new String[map.size()+2];
-        slpArray[0] = wlkArray[0] = swimArray[0] = plyArray[0] = 0;
-        slpArray[slpArray.length-1] = wlkArray[wlkArray.length-1] = swimArray[swimArray.length-1] = plyArray[plyArray.length-1] = 0;
-        xLabels[0] = ".";
-        xLabels[xLabels.length-1] = ".";
-        int k = 1;
-        for(int tmpTbl : map.keySet()){
-            plyArray[k]  = Math.round((map.get(tmpTbl)[0]/60)  * 10.0 ) / 10.0;
-            swimArray[k] = Math.round((map.get(tmpTbl)[1]/60)  * 10.0 ) / 10.0;
-            slpArray[k]  = Math.round((map.get(tmpTbl)[2]/60)  * 10.0 ) / 10.0;
-            wlkArray[k]  = Math.round((map.get(tmpTbl)[3]/60)  * 10.0 ) / 10.0;
-            xLabels[k]   = (daf.getDogBasic(tmpTbl)).getName();
-            k++;
-        }
-        plot.clear();
-        drawPlot(slpArray, wlkArray, swimArray, plyArray, xLabels);
-        plot.redraw();*/
 
     }
 
@@ -255,9 +272,9 @@ public class Tab_activities_activity extends Activity {
         plot.getGraphWidget().setDomainValueFormat(new GraphXLabelFormat(xLabels));
 
         // Turn the above arrays into XYSeries':
-        XYSeries series1 = new SimpleXYSeries(Arrays.asList(slpArray), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY,   "sleep");
+        XYSeries series1 = new SimpleXYSeries(Arrays.asList(slpArray), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY,   "play");
         XYSeries series2 = new SimpleXYSeries(Arrays.asList(wlkArray), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY,   "walk");
-        XYSeries series3 = new SimpleXYSeries(Arrays.asList(plyArray), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY,   "play");
+        XYSeries series3 = new SimpleXYSeries(Arrays.asList(plyArray), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY,   "sleep");
         XYSeries series4 = new SimpleXYSeries(Arrays.asList(swimArray), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY,  "swim");
         //     XYSeries series3 = new SimpleXYSeries(Arrays.asList(series3Numbers), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Series3");
 
@@ -492,5 +509,17 @@ public class Tab_activities_activity extends Activity {
                 return getFormatter(series);
             }
         }
+    }
+
+    private String getDate(String dateValue) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "MM/dd", Locale.getDefault());
+        Date date = null;
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dateValue);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return dateFormat.format(date);
     }
 }
