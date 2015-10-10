@@ -149,7 +149,7 @@ public class Tab_Home_activity extends Activity {
 
 
         checkAtLeastOneDogAvailable(this);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+      //  getActionBar().setDisplayHomeAsUpEnabled(true);
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
