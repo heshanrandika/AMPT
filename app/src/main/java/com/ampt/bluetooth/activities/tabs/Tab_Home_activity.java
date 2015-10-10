@@ -80,6 +80,7 @@ public class Tab_Home_activity extends Activity {
 
     private final String LIST_NAME = "NAME";
     private final String LIST_UUID = "UUID";
+    private Intent gattServiceIntent;
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -150,8 +151,8 @@ public class Tab_Home_activity extends Activity {
 
         checkAtLeastOneDogAvailable(this);
       //  getActionBar().setDisplayHomeAsUpEnabled(true);
-        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
-        bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+        gattServiceIntent = new Intent(this, BluetoothLeService.class);
+        getApplicationContext().bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
 
         engageTxt.setOnClickListener(new View.OnClickListener() {
@@ -181,6 +182,7 @@ public class Tab_Home_activity extends Activity {
                 System.out.println("ccccccccccccccccccc    "+Long.parseLong(dogsData.getImageID()));
                 mDeviceAddress = dogsData.getDeviceAddress();
                 mDeviceName = dogsData.getDeviceName();
+                dog_id = dogsData.getId();
                 ImageSetter.setImage(this, iv, Long.parseLong(dogsData.getImageID()));
             } else {
                 startActivity(new Intent(context, DeviceScanActivity.class));
@@ -194,54 +196,28 @@ public class Tab_Home_activity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        getApplicationContext().registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        getApplicationContext().bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
         if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
-            Log.d(TAG, "Connect request result=" + result);
+
+          //  final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+          //  Log.d(TAG, "Connect request result=" + result);
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(mGattUpdateReceiver);
+        getApplicationContext().unregisterReceiver(mGattUpdateReceiver);
+        getApplicationContext().unbindService(mServiceConnection);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(mServiceConnection);
         mBluetoothLeService = null;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.gatt_services, menu);
-        if (mConnected) {
-            menu.findItem(R.id.menu_connect).setVisible(false);
-            menu.findItem(R.id.menu_disconnect).setVisible(true);
-        } else {
-            menu.findItem(R.id.menu_connect).setVisible(true);
-            menu.findItem(R.id.menu_disconnect).setVisible(false);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
-            case R.id.menu_connect:
-                mBluetoothLeService.connect(mDeviceAddress);
-                return true;
-            case R.id.menu_disconnect:
-                mBluetoothLeService.disconnect();
-                return true;
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     private void updateConnectionState(final int resourceId) {
         runOnUiThread(new Runnable() {
@@ -283,10 +259,7 @@ public class Tab_Home_activity extends Activity {
         int plyH = ply/60; int plyM = ply%60;
         int swmH = swm/60; int swmM = swm%60;
 
-       /* sleepTime.setText(slpH+"h "+slpM+"min");
-        walkTime.setText(wlkH+"h "+wlkM+"min");
-        playTime.setText(plyH+"h "+plyM+"min");
-        swimTime.setText(swmH+"h "+swmM+"min");*/
+
     }
 
     // Demonstrates how to iterate through the supported GATT Services/Characteristics.

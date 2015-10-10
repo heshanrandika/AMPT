@@ -58,8 +58,8 @@ public class DeviceControlActivity extends Activity {
     private TextView mConnectionState;
     private TextView mDataField;
     private SeekBar mRed,mGreen,mBlue;
-    private String mDeviceName;
-    private String mDeviceAddress;
+    private String mDeviceName ="test";
+    private String mDeviceAddress = "7C:66:9D:9A:BE:3B";
   //  private ExpandableListView mGattServicesList;
     private BluetoothLeService mBluetoothLeService;
      private boolean mConnected = false;
@@ -131,8 +131,8 @@ public class DeviceControlActivity extends Activity {
         setContentView(R.layout.gatt_services_characteristics);
 
         final Intent intent = getIntent();
-        mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
-        mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
+      /*  mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
+        mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);*/
 
         // Sets up UI references.
         ((TextView) findViewById(R.id.device_address)).setText(mDeviceAddress);
@@ -149,10 +149,10 @@ public class DeviceControlActivity extends Activity {
         readSeek(mGreen,1);
         readSeek(mBlue,2);
      
-        getActionBar().setTitle(mDeviceName);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+     /*   getActionBar().setTitle(mDeviceName);
+        getActionBar().setDisplayHomeAsUpEnabled(true);*/
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
-        bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+        getApplicationContext().bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
     }
 
     @Override
@@ -168,17 +168,17 @@ public class DeviceControlActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(mGattUpdateReceiver);
+        getApplicationContext().unregisterReceiver(mGattUpdateReceiver);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(mServiceConnection);
+        getApplicationContext().unbindService(mServiceConnection);
         mBluetoothLeService = null;
     }
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.gatt_services, menu);
         if (mConnected) {
@@ -189,9 +189,9 @@ public class DeviceControlActivity extends Activity {
             menu.findItem(R.id.menu_disconnect).setVisible(false);
         }
         return true;
-    }
+    }*/
 
-    @Override
+   /* @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.menu_connect:
@@ -206,7 +206,7 @@ public class DeviceControlActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
-
+*/
     private void updateConnectionState(final int resourceId) {
         runOnUiThread(new Runnable() {
             @Override

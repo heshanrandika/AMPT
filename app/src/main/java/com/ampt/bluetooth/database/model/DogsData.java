@@ -13,8 +13,8 @@ public class DogsData {
     private int age;
     private String created_at;
     private String goal;
-    private int goalWalk;
-    private int goalPlay;
+    private int goalWalk = 15;
+    private int goalPlay = 15;
     private String gender;
     private String dob;
     private String breed;

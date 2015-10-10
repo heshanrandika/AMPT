@@ -53,6 +53,7 @@ import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -163,7 +164,7 @@ public class Tab_activities_activity extends Activity {
 
 
     public void setGaolView(){
-       DogsData data =  daf.getDogBasic(dog_id);
+        DogsData data =  daf.getDogBasic(dog_id);
         walkPrograss.setMax(data.getGoalWalk());
         playPrograss.setMax(data.getGoalPlay());
         int walk = 0;
@@ -190,7 +191,7 @@ public class Tab_activities_activity extends Activity {
             SpannableString content = new SpannableString("ARCHIVE");
             content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
             archive.setText(content);
-            activityData = daf.getAllActivityDateRange(90);
+            activityData = daf.getAllActivityDogDateRange(dog_id, 90);
             barPlot.setVisibility(View.INVISIBLE);
             plot.setVisibility(View.VISIBLE);
             drawPlot(new Number[]{}, new Number[]{}, new Number[]{}, new Number[]{}, new String[]{});
@@ -247,17 +248,56 @@ public class Tab_activities_activity extends Activity {
             SpannableString content = new SpannableString("DAILY");
             content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
             daily.setText(content);
-            activityData = daf.getAllActivityDateRange(0);
+            activityData = daf.getAllActivityDogDateRange(dog_id, 7);
             barPlot.setVisibility(View.VISIBLE);
             plot.setVisibility(View.INVISIBLE);
 
+            HashMap<String, Double[]> map = new HashMap<String, Double[]>();
+            String day;
+            for(ActivityData activityD  : activityData){
+                day = matchWeek(activityD.getCreatedAt());
+                if(!day.equals("")){
+                    Double [] tempNum = new Double[4];
+                    tempNum[0] = Double.valueOf(activityD.getPlay());
+                    tempNum[1] = Double.valueOf(activityD.getWalk());
+                    tempNum[2] = Double.valueOf(activityD.getSwimming());
+                    tempNum[3] = Double.valueOf(activityD.getSleep());
+
+                    if(map.containsKey(day)){
+                        map.get(day)[0] += tempNum[0];
+                        map.get(day)[1] += tempNum[1];
+                        map.get(day)[2] += tempNum[2];
+                        map.get(day)[3] += tempNum[3];
+                    }else{
+                        map.put(day,tempNum);
+                    }
+                }
 
 
+            }
+
+            String[] xLabels = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+            Number[] slpArray = new Number[7];
+            Number[] wlkArray = new Number[7];
+            Number[] swimArray = new Number[7];
+            Number[] plyArray = new Number[7];
+            for(int k=0; k<xLabels.length; k++){
+                if(map.containsKey(xLabels[k])){
+                    plyArray[k]  = Math.round((map.get(xLabels[k])[0]/60)  * 10.0 ) / 10.0;
+                    wlkArray[k]  = Math.round((map.get(xLabels[k])[1]/60)  * 10.0 ) / 10.0;
+                    swimArray[k]  = Math.round((map.get(xLabels[k])[2]/60)  * 10.0 ) / 10.0;
+                    slpArray[k]  = Math.round((map.get(xLabels[k])[3]/60)  * 10.0 ) / 10.0;
+                }else{
+                    plyArray[k]  = 0;
+                    wlkArray[k]  = 0;
+                    swimArray[k] = 0;
+                    slpArray[k]  = 0;
+                }
+
+            }
 
 
-
-
-            drawBarPlot();
+            drawBarPlot(plyArray,wlkArray,swimArray,slpArray,xLabels);
         }
 
 
@@ -272,10 +312,10 @@ public class Tab_activities_activity extends Activity {
         plot.getGraphWidget().setDomainValueFormat(new GraphXLabelFormat(xLabels));
 
         // Turn the above arrays into XYSeries':
-        XYSeries series1 = new SimpleXYSeries(Arrays.asList(slpArray), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY,   "play");
+        XYSeries series1 = new SimpleXYSeries(Arrays.asList(plyArray), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY,   "play");
         XYSeries series2 = new SimpleXYSeries(Arrays.asList(wlkArray), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY,   "walk");
-        XYSeries series3 = new SimpleXYSeries(Arrays.asList(plyArray), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY,   "sleep");
-        XYSeries series4 = new SimpleXYSeries(Arrays.asList(swimArray), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY,  "swim");
+        //  XYSeries series3 = new SimpleXYSeries(Arrays.asList(slpArray), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY,   "sleep");
+        //  XYSeries series4 = new SimpleXYSeries(Arrays.asList(swimArray), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY,  "swim");
         //     XYSeries series3 = new SimpleXYSeries(Arrays.asList(series3Numbers), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Series3");
 
         // Create a formatter to use for drawing a series using LineAndPointRenderer
@@ -283,7 +323,7 @@ public class Tab_activities_activity extends Activity {
         LineAndPointFormatter series1Format = new LineAndPointFormatter();
         series1Format.setPointLabelFormatter(new PointLabelFormatter());
         series1Format.configure(getApplicationContext(),
-                R.xml.line_point_formatter_with_plf1);
+                R.xml.line_point_formatter_with_plf3);
         //  LineAndPointFormatter series1Format = new LineAndPointFormatter(Color.RED, Color.GREEN, Color.BLUE, null);
         // add a new series' to the xyplot:
         plot.addSeries(series1, series1Format);
@@ -292,44 +332,75 @@ public class Tab_activities_activity extends Activity {
         LineAndPointFormatter series2Format = new LineAndPointFormatter();
         series2Format.setPointLabelFormatter(new PointLabelFormatter());
         series2Format.configure(getApplicationContext(),
-                R.xml.line_point_formatter_with_plf2);
+                R.xml.line_point_formatter_with_plf4);
         //  LineAndPointFormatter series2Format = new LineAndPointFormatter(Color.RED, Color.GREEN, Color.BLUE, null);
         plot.addSeries(series2, series2Format);
 
-        LineAndPointFormatter series3Format = new LineAndPointFormatter();
+     /*   LineAndPointFormatter series3Format = new LineAndPointFormatter();
         series3Format.setPointLabelFormatter(new PointLabelFormatter());
         series3Format.configure(getApplicationContext(),
-                R.xml.line_point_formatter_with_plf3);
+                R.xml.line_point_formatter_with_plf1);
         //  LineAndPointFormatter series2Format = new LineAndPointFormatter(Color.RED, Color.GREEN, Color.BLUE, null);
-        plot.addSeries(series3, series3Format);
+        plot.addSeries(series3, series3Format);*/
 
-        LineAndPointFormatter series4Format = new LineAndPointFormatter();
+       /* LineAndPointFormatter series4Format = new LineAndPointFormatter();
         series4Format.setPointLabelFormatter(new PointLabelFormatter());
         series4Format.configure(getApplicationContext(),
-                R.xml.line_point_formatter_with_plf4);
+                R.xml.line_point_formatter_with_plf2);
         //  LineAndPointFormatter series2Format = new LineAndPointFormatter(Color.RED, Color.GREEN, Color.BLUE, null);
-        plot.addSeries(series4, series4Format);
+        plot.addSeries(series4, series4Format);*/
 
         // reduce the number of range labels
         //  plot.setRangeStep(XYStepMode.INCREMENT_BY_VAL, 125);
         plot.setDomainStep(XYStepMode.SUBDIVIDE, xLabels.length);
         plot.setTicksPerRangeLabel(1);
-        //  plot.setTicksPerDomainLabel(3);
+      //  plot.setTicksPerDomainLabel(3);
         plot.getGraphWidget().setDomainLabelOrientation(-10);
         //  plot.getGraphWidget().getBackgroundPaint().setColor(Color.WHITE);
-        plot.setDomainLabel("Name");
-        plot.getGraphWidget().getGridBackgroundPaint().setColor(Color.WHITE);
+/*         plot.setDomainLabel("Name");
+      plot.getGraphWidget().getGridBackgroundPaint().setColor(Color.WHITE);
         plot.getGraphWidget().getDomainLabelPaint().setColor(Color.WHITE);
         plot.getGraphWidget().getRangeLabelPaint().setColor(Color.WHITE);
 
         plot.getGraphWidget().getDomainOriginLabelPaint().setColor(Color.WHITE);
         plot.getGraphWidget().getDomainOriginLinePaint().setColor(Color.WHITE);
-        plot.getGraphWidget().getRangeOriginLinePaint().setColor(Color.WHITE);
+        plot.getGraphWidget().getRangeOriginLinePaint().setColor(Color.WHITE);*/
+
+
+        plot.getGraphWidget().getDomainLabelPaint().setColor(Color.BLACK);
+        plot.setPlotMargins(0, 0, 0, 0);
+        plot.setPlotPadding(0, 0, 0, 0);
+        plot.setDomainLabelWidget(null);
+        plot.setRangeLabelWidget(null);
+
+        plot.setBackgroundPaint(null);
+        plot.getGraphWidget().setBackgroundPaint(null);
+        plot.getGraphWidget().setGridBackgroundPaint(null);
+        plot.setBorderPaint(null);
+
+
+        plot.getGraphWidget().setRangeLabelWidth(0.0f);
+        plot.getGraphWidget().setRangeLabelPaint(null);
+        plot.getGraphWidget().setRangeOriginLabelPaint(null);
+
+
+        plot.getGraphWidget().setRangeOriginLinePaint(null);
+
+        plot.getLayoutManager().remove(barPlot.getTitleWidget());
+
+        plot.getGraphWidget().getDomainGridLinePaint().setColor(Color.TRANSPARENT);
+        plot.getGraphWidget().getRangeGridLinePaint().setColor(Color.TRANSPARENT);
+        plot.getGraphWidget().getRangeSubGridLinePaint().setColor(Color.TRANSPARENT);
+
+        plot.getLayoutManager().remove(barPlot.getLegendWidget());
+        plot.getLayoutManager().remove(barPlot.getRangeLabelWidget());
+
+
 
     }
 
 
-    public void drawBarPlot(){
+    public void drawBarPlot(Number[] plyArray, Number[] wlkArray, Number[] swimArray, Number[] slpArray, String[] xLabels){
         XYSeries series1;
         XYSeries series2;
 
@@ -337,11 +408,12 @@ public class Tab_activities_activity extends Activity {
         MyBarFormatter formatter1;
         MyBarFormatter formatter2;
 
-        Number[] series1Numbers10 = {2, null, 5, 2,    7, 4, 3};
-        Number[] series2Numbers10 = {4, 6,    5, null, 2, 0, 7};
+        Number[] series1Numbers10 = plyArray;
+        Number[] series2Numbers10 = wlkArray;
         Number[] series1Numbers = series1Numbers10;
         Number[] series2Numbers = series2Numbers10;
 
+        barPlot.setDomainValueFormat(new BarXLabelFormat(xLabels));
         formatter1 = new MyBarFormatter(Color.argb(255, 255, 103, 39), Color.LTGRAY);
         formatter2 = new MyBarFormatter(Color.argb(255, 89, 139, 178), Color.LTGRAY);
         Iterator<XYSeries> iterator1 = barPlot.getSeriesSet().iterator();
@@ -371,7 +443,7 @@ public class Tab_activities_activity extends Activity {
 
 
         TextLabelWidget selectionWidget;
-        final String NO_SELECTION_TXT = "  Fri, July 31  ";
+        final String NO_SELECTION_TXT = "| "+new SimpleDateFormat("EEE,MMM dd  ").format(new Date());
 
 
         selectionFormatter = new MyBarFormatter(Color.YELLOW, Color.WHITE);
@@ -389,17 +461,20 @@ public class Tab_activities_activity extends Activity {
         p.setARGB(100, 0, 0, 0);
         selectionWidget.setBackgroundPaint(p);
 
-        selectionWidget.position(0, XLayoutStyle.RELATIVE_TO_CENTER,PixelUtils.dpToPix(45), YLayoutStyle.ABSOLUTE_FROM_TOP, AnchorPosition.TOP_MIDDLE);
+        selectionWidget.position(0, XLayoutStyle.RELATIVE_TO_RIGHT,PixelUtils.dpToPix(5), YLayoutStyle.ABSOLUTE_FROM_TOP, AnchorPosition.RIGHT_TOP);
         selectionWidget.pack();
 
-        barPlot.setTicksPerRangeLabel(3);
+      //  barPlot.setTicksPerRangeLabel(3);
         barPlot.setRangeLowerBoundary(0, BoundaryMode.FIXED);
         barPlot.getGraphWidget().setGridPadding(30, 10, 30, 0);
-        barPlot.setTicksPerDomainLabel(2);
+      //  barPlot.setTicksPerDomainLabel(14);
 
+        barPlot.getGraphWidget().getDomainLabelPaint().setColor(Color.BLACK);
         barPlot.setPlotMargins(0, 0, 0, 0);
         barPlot.setPlotPadding(0, 0, 0, 0);
-        barPlot.setDomainLabelWidget(null);
+        barPlot.getDomainLabelWidget().position(0, XLayoutStyle.ABSOLUTE_FROM_CENTER, 0, YLayoutStyle.RELATIVE_TO_BOTTOM, AnchorPosition.BOTTOM_MIDDLE);
+
+        barPlot.setDomainStep(XYStepMode.INCREMENT_BY_VAL, 1);
         barPlot.setRangeLabelWidget(null);
 
         barPlot.setBackgroundPaint(null);
@@ -425,30 +500,40 @@ public class Tab_activities_activity extends Activity {
 
 
 
-        barPlot.setDomainValueFormat(new NumberFormat() {
-            @Override
-            public StringBuffer format(double value, StringBuffer buffer, FieldPosition field) {
-                int year = (int) (value + 0.5d) / 12;
-                int month = (int) ((value + 0.5d) % 12);
-                return new StringBuffer(DateFormatSymbols.getInstance().getShortMonths()[month] + " '0" + year);
-            }
 
-            @Override
-            public StringBuffer format(long value, StringBuffer buffer, FieldPosition field) {
-                throw new UnsupportedOperationException("Not yet implemented.");
-            }
-
-            @Override
-            public Number parse(String string, ParsePosition position) {
-                throw new UnsupportedOperationException("Not yet implemented.");
-            }
-        });
     }
 
     class GraphXLabelFormat extends Format {
         String[] xLabels;
 
         GraphXLabelFormat(String[] xLabels) {
+            this.xLabels = xLabels;
+        }
+
+        @Override
+        public StringBuffer format(Object arg0, StringBuffer arg1, FieldPosition arg2) {
+            // TODO Auto-generated method stub
+
+            int parsedInt = Math.round(Float.parseFloat(arg0.toString()));
+            //  Log.d("test", parsedInt + " " + arg1 + " " + arg2);
+            String labelString = xLabels[parsedInt];
+            arg1.append(labelString);
+            return arg1;
+        }
+
+        @Override
+        public Object parseObject(String arg0, ParsePosition arg1) {
+            // TODO Auto-generated method stub
+            return java.util.Arrays.asList(xLabels).indexOf(arg0);
+        }
+    }
+
+
+
+    class BarXLabelFormat extends Format {
+        String[] xLabels;
+
+        BarXLabelFormat(String[] xLabels) {
             this.xLabels = xLabels;
         }
 
@@ -521,5 +606,24 @@ public class Tab_activities_activity extends Activity {
             e.printStackTrace();
         }
         return dateFormat.format(date);
+    }
+
+    private String matchWeek(String dateValue){
+        Calendar now = Calendar.getInstance();
+        Calendar checkDate = Calendar.getInstance();
+
+        Date date = null;
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dateValue);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        checkDate.setTime(date);
+
+        if(now.get(Calendar.WEEK_OF_YEAR) == checkDate.get(Calendar.WEEK_OF_YEAR)){
+            return new SimpleDateFormat("EEE").format(date);
+        }
+        return "";
+
     }
 }
