@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothGattService;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -22,6 +23,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ampt.bluetooth.R;
 import com.ampt.bluetooth.SampleGattAttributes;
@@ -29,6 +31,8 @@ import com.ampt.bluetooth.Util.ImageSetter;
 import com.ampt.bluetooth.Util.SharedPref;
 import com.ampt.bluetooth.activities.BluetoothLeService;
 import com.ampt.bluetooth.activities.DeviceScanActivity;
+import com.ampt.bluetooth.activities.dialogs.EditDogDialog;
+import com.ampt.bluetooth.activities.dialogs.ViewDogDialog;
 import com.ampt.bluetooth.chartView;
 import com.ampt.bluetooth.database.helper.DatabaseHelper;
 import com.ampt.bluetooth.database.model.ActivityData;
@@ -65,7 +69,11 @@ public class Tab_Home_activity extends Activity {
 
     private String img;
     private long dog_id;
+    private DogsData dogsData;
     private TextView engageTxt;
+    private ImageButton infoBtn;
+    private TextView dogNameTxt;
+
     private String mDeviceName;
     private String mDeviceAddress;
     //  private ExpandableListView mGattServicesList;
@@ -139,6 +147,7 @@ public class Tab_Home_activity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab_home_layout);
+        final Context context = this;
 
         final Intent intent = getIntent();
         mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
@@ -146,11 +155,13 @@ public class Tab_Home_activity extends Activity {
 
         iv = (ImageView) findViewById(R.id.profile_image);
         engageTxt = (TextView) findViewById(R.id.engage_txt);
+        infoBtn = (ImageButton) findViewById(R.id.tab_home_info);
+        dogNameTxt = (TextView) findViewById(R.id.tab_home_dog_name);
 
 
 
         checkAtLeastOneDogAvailable(this);
-      //  getActionBar().setDisplayHomeAsUpEnabled(true);
+        //  getActionBar().setDisplayHomeAsUpEnabled(true);
         gattServiceIntent = new Intent(this, BluetoothLeService.class);
         getApplicationContext().bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
@@ -161,6 +172,25 @@ public class Tab_Home_activity extends Activity {
                 makeChange(COLLAR_CLICK);
             }
         });
+        infoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(dogsData != null){
+                    ViewDogDialog dialog = new ViewDogDialog(context, dogsData);
+
+                    dialog.show();
+                    dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+
+                        }
+                    });
+                }else{
+                    Toast.makeText(Tab_Home_activity.this, "Data not available!!", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
 
 
     }
@@ -169,20 +199,22 @@ public class Tab_Home_activity extends Activity {
     private void checkAtLeastOneDogAvailable(Context context) {
         dog_id = SharedPref.getCurrentDogId(context);
         if(dog_id != 0){
-            DogsData dogsData = daf.getDogProfile(dog_id);
+            dogsData = daf.getDogProfile(dog_id);
             System.out.println("ccccccccccccccccccc    "+Long.parseLong(dogsData.getImageID()));
             mDeviceAddress = dogsData.getDeviceAddress();
             mDeviceName = dogsData.getDeviceName();
+            dogNameTxt.setText(dogsData.getName());
             ImageSetter.setImage(this, iv, Long.parseLong(dogsData.getImageID()));
         }else{
             List<DogsData> dogsDataList = daf.getAllDogProfile();
             if (null != dogsDataList && dogsDataList.size() > 0) {
                 long defaultId = SharedPref.getDefaultDogId(context);
-                DogsData dogsData = daf.getDogProfile(defaultId);
+                dogsData = daf.getDogProfile(defaultId);
                 System.out.println("ccccccccccccccccccc    "+Long.parseLong(dogsData.getImageID()));
                 mDeviceAddress = dogsData.getDeviceAddress();
                 mDeviceName = dogsData.getDeviceName();
                 dog_id = dogsData.getId();
+                dogNameTxt.setText(dogsData.getName());
                 ImageSetter.setImage(this, iv, Long.parseLong(dogsData.getImageID()));
             } else {
                 startActivity(new Intent(context, DeviceScanActivity.class));
@@ -200,8 +232,8 @@ public class Tab_Home_activity extends Activity {
         getApplicationContext().bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
         if (mBluetoothLeService != null) {
 
-          //  final boolean result = mBluetoothLeService.connect(mDeviceAddress);
-          //  Log.d(TAG, "Connect request result=" + result);
+            //  final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+            //  Log.d(TAG, "Connect request result=" + result);
         }
     }
 

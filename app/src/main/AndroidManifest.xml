@@ -78,7 +78,7 @@
         <activity
             android:name="com.ampt.bluetooth.activities.TabbedMainActivity"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.Light.DarkActionBar" />
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
         <activity
             android:name="com.ampt.bluetooth.activities.tabs.Tab_activities_activity"
             android:screenOrientation="portrait" />
@@ -87,8 +87,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name="com.ampt.bluetooth.activities.tabs.Tab_Home_activity"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.Light.DarkActionBar" />
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".activities.AddDogActivity"

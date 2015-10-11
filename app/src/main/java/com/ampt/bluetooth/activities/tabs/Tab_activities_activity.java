@@ -2,6 +2,8 @@ package com.ampt.bluetooth.activities.tabs;
 
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,18 +12,15 @@ import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.Pair;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ampt.bluetooth.R;
-import com.ampt.bluetooth.Util.ImageSetter;
 import com.ampt.bluetooth.Util.SharedPref;
 import com.ampt.bluetooth.activities.DeviceScanActivity;
+import com.ampt.bluetooth.activities.dialogs.ViewDogDialog;
 import com.ampt.bluetooth.database.helper.DatabaseHelper;
 import com.ampt.bluetooth.database.model.ActivityData;
 import com.ampt.bluetooth.database.model.DogsData;
@@ -44,10 +43,8 @@ import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYSeries;
 import com.androidplot.xy.XYStepMode;
 
-import java.text.DateFormatSymbols;
 import java.text.FieldPosition;
 import java.text.Format;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -75,6 +72,9 @@ public class Tab_activities_activity extends Activity {
     private ProgressBar playPrograss;
     private ProgressBar walkPrograss;
     private long dog_id;
+    private DogsData dogData;
+    private ImageButton infoBtn;
+    private TextView dogName;
 
     private Pair<Integer, XYSeries> selection;
     private MyBarFormatter selectionFormatter;
@@ -114,15 +114,20 @@ public class Tab_activities_activity extends Activity {
         }
     }*/
 
-
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setDog();
+        processData(0);
+        setGaolView();
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab_activity_layout);
-
+        final Context context = this;
 
         daily = (TextView)findViewById(R.id.daily_lbl);
         archive = (TextView)findViewById(R.id.arch_lbl);
@@ -130,17 +135,30 @@ public class Tab_activities_activity extends Activity {
         goalWalk = (TextView)findViewById(R.id.walk_txt);
         walkPrograss = (ProgressBar)findViewById(R.id.walk_progressBar);
         playPrograss = (ProgressBar)findViewById(R.id.play_progressBar);
+        infoBtn = (ImageButton)findViewById(R.id.tab_activity_info);
+        dogName = (TextView)findViewById(R.id.tab_activity_dog_name);
 
-        dog_id = SharedPref.getCurrentDogId(this);
-        if(dog_id == 0){
-            List<DogsData> dogsDataList = daf.getAllDogProfile();
-            if (null != dogsDataList && dogsDataList.size() > 0) {
-                dog_id = SharedPref.getDefaultDogId(this);
-            } else {
-                startActivity(new Intent(this, DeviceScanActivity.class));
+
+        setDog();
+        infoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(dogData != null){
+                    ViewDogDialog dialog = new ViewDogDialog(context, dogData);
+
+                    dialog.show();
+                    dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+
+                        }
+                    });
+                }else{
+                    Toast.makeText(Tab_activities_activity.this, "Data not available!!", Toast.LENGTH_SHORT).show();
+                }
+
             }
-        }
-
+        });
 
         archive.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -162,23 +180,40 @@ public class Tab_activities_activity extends Activity {
         setGaolView();
     }
 
+    private void setDog(){
+        dog_id = SharedPref.getCurrentDogId(this);
+        if(dog_id == 0){
+            List<DogsData> dogsDataList = daf.getAllDogProfile();
+            if (null != dogsDataList && dogsDataList.size() > 0) {
+                dog_id = SharedPref.getDefaultDogId(this);
+                dogData =  daf.getDogProfile(dog_id);
+            } else {
+                startActivity(new Intent(this, DeviceScanActivity.class));
+            }
+        }
+    }
 
     public void setGaolView(){
-        DogsData data =  daf.getDogBasic(dog_id);
-        walkPrograss.setMax(data.getGoalWalk());
-        playPrograss.setMax(data.getGoalPlay());
-        int walk = 0;
-        int play = 0;
-        ArrayList<ActivityData> activityData = daf.getAllActivityDogDateRange(dog_id,0);
-        for(ActivityData activityD  : activityData){
-            play += activityD.getPlay();
-            walk += activityD.getWalk();
+        if(dogData != null){
+            dogName.setText(dogData.getName());
+            walkPrograss.setMax(dogData.getGoalWalk());
+            playPrograss.setMax(dogData.getGoalPlay());
+            int walk = 0;
+            int play = 0;
+            ArrayList<ActivityData> activityData = daf.getAllActivityDogDateRange(dog_id,0);
+            for(ActivityData activityD  : activityData){
+                play += activityD.getPlay();
+                walk += activityD.getWalk();
+            }
+
+            goalPlay.setText("Play \n"+ play+"/"+dogData.getGoalPlay()+"min");
+            goalWalk.setText("Walk \n"+ walk+"/"+dogData.getGoalWalk()+"min");
+            walkPrograss.setProgress(walk);
+            playPrograss.setProgress(play);
+        }else{
+
         }
 
-        goalPlay.setText("Play \n"+ play+"/"+data.getGoalPlay()+"min");
-        goalWalk.setText("Walk \n"+ walk+"/"+data.getGoalWalk()+"min");
-        walkPrograss.setProgress(walk);
-        playPrograss.setProgress(play);
     }
 
     public void processData(int pos){
@@ -283,10 +318,10 @@ public class Tab_activities_activity extends Activity {
             Number[] plyArray = new Number[7];
             for(int k=0; k<xLabels.length; k++){
                 if(map.containsKey(xLabels[k])){
-                    plyArray[k]  = Math.round((map.get(xLabels[k])[0]/60)  * 10.0 ) / 10.0;
-                    wlkArray[k]  = Math.round((map.get(xLabels[k])[1]/60)  * 10.0 ) / 10.0;
-                    swimArray[k]  = Math.round((map.get(xLabels[k])[2]/60)  * 10.0 ) / 10.0;
-                    slpArray[k]  = Math.round((map.get(xLabels[k])[3]/60)  * 10.0 ) / 10.0;
+                    plyArray[k]  = map.get(xLabels[k])[0];
+                    wlkArray[k]  = map.get(xLabels[k])[1];
+                    swimArray[k]  =map.get(xLabels[k])[2];
+                    slpArray[k]  = map.get(xLabels[k])[3];
                 }else{
                     plyArray[k]  = 0;
                     wlkArray[k]  = 0;
@@ -295,9 +330,17 @@ public class Tab_activities_activity extends Activity {
                 }
 
             }
+            boolean checkZero = false;
+            for(int i=0; i<plyArray.length; i++){
+                if((plyArray[i] != 0) || (wlkArray[i] != 0) ){
+                    checkZero = true;
+                    break;
+                }
+            }
+            barPlot.clear();
+            drawBarPlot(plyArray, wlkArray, swimArray, slpArray, xLabels, checkZero);
+            barPlot.redraw();
 
-
-            drawBarPlot(plyArray,wlkArray,swimArray,slpArray,xLabels);
         }
 
 
@@ -354,7 +397,7 @@ public class Tab_activities_activity extends Activity {
         //  plot.setRangeStep(XYStepMode.INCREMENT_BY_VAL, 125);
         plot.setDomainStep(XYStepMode.SUBDIVIDE, xLabels.length);
         plot.setTicksPerRangeLabel(1);
-      //  plot.setTicksPerDomainLabel(3);
+        //  plot.setTicksPerDomainLabel(3);
         plot.getGraphWidget().setDomainLabelOrientation(-10);
         //  plot.getGraphWidget().getBackgroundPaint().setColor(Color.WHITE);
 /*         plot.setDomainLabel("Name");
@@ -400,13 +443,22 @@ public class Tab_activities_activity extends Activity {
     }
 
 
-    public void drawBarPlot(Number[] plyArray, Number[] wlkArray, Number[] swimArray, Number[] slpArray, String[] xLabels){
+    public void drawBarPlot(Number[] plyArray, Number[] wlkArray, Number[] swimArray, Number[] slpArray, String[] xLabels, boolean checkZero){
         XYSeries series1;
         XYSeries series2;
 
 
         MyBarFormatter formatter1;
         MyBarFormatter formatter2;
+
+        if(checkZero){
+            barPlot.setRangeBoundaries(0, BoundaryMode.FIXED, 1, BoundaryMode.GROW);
+        }else{
+            barPlot.setRangeBoundaries(0, BoundaryMode.FIXED, 1000, BoundaryMode.FIXED);
+        }
+        //
+        //   barPlot.setRangeBoundaries(0, BoundaryMode.FIXED, 50, BoundaryMode.GROW);
+
 
         Number[] series1Numbers10 = plyArray;
         Number[] series2Numbers10 = wlkArray;
@@ -464,10 +516,10 @@ public class Tab_activities_activity extends Activity {
         selectionWidget.position(0, XLayoutStyle.RELATIVE_TO_RIGHT,PixelUtils.dpToPix(5), YLayoutStyle.ABSOLUTE_FROM_TOP, AnchorPosition.RIGHT_TOP);
         selectionWidget.pack();
 
-      //  barPlot.setTicksPerRangeLabel(3);
+        //  barPlot.setTicksPerRangeLabel(3);
         barPlot.setRangeLowerBoundary(0, BoundaryMode.FIXED);
         barPlot.getGraphWidget().setGridPadding(30, 10, 30, 0);
-      //  barPlot.setTicksPerDomainLabel(14);
+        //  barPlot.setTicksPerDomainLabel(14);
 
         barPlot.getGraphWidget().getDomainLabelPaint().setColor(Color.BLACK);
         barPlot.setPlotMargins(0, 0, 0, 0);
@@ -543,8 +595,11 @@ public class Tab_activities_activity extends Activity {
 
             int parsedInt = Math.round(Float.parseFloat(arg0.toString()));
             //  Log.d("test", parsedInt + " " + arg1 + " " + arg2);
-            String labelString = xLabels[parsedInt];
-            arg1.append(labelString);
+            if(parsedInt>=0){
+                String labelString = xLabels[parsedInt];
+                arg1.append(labelString);
+            }
+
             return arg1;
         }
 
